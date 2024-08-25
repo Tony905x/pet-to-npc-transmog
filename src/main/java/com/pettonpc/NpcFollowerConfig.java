@@ -3,6 +3,7 @@ package com.pettonpc;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigSection;
 
 @ConfigGroup(NpcFollowerConfig.GROUP)
 public interface NpcFollowerConfig extends Config
@@ -20,6 +21,14 @@ public interface NpcFollowerConfig extends Config
 		return NpcData.GnomeChild;
 	}
 
+	@ConfigSection(
+		name = "Custom",
+		description = "Custom Options",
+		position = 1,
+		closedByDefault = true
+	)
+	String customSection = "Custom NPCs";
+
 	@ConfigItem(
 		keyName = "enableCustom",
 		name = "Enable Custom Configuration",
@@ -27,7 +36,8 @@ public interface NpcFollowerConfig extends Config
 			"you can perform a web search for 'OSRS NPC modelIDs' or 'RuneScape animation IDs'. Some users have found " +
 			"resources like https://runemonk.com/tools/entityviewer/ or https://chisel.weirdgloop.org/moid/index.html site " +
 			"to be helpful. Please note that these are external sites and may change over time.",
-		position = 1
+		position = 1,
+		section = customSection
 	)
 	default boolean enableCustom()
 	{
@@ -41,7 +51,8 @@ public interface NpcFollowerConfig extends Config
 		description = "Enter the modelID of the NPC you want to overlay. Most NPC's will have a single ModelIDs" +
 			"you can leave the rest of the ModelID fields at 0 if this is the case.  Make sure you are using the " +
 			"ModelID and not the NPCID.",
-		position = 2
+		position = 2,
+		section = customSection
 	)
 	default int npcModelID1()
 	{
@@ -52,7 +63,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "npcModelID2",
 		name = "CUSTOM ModelID2",
 		description = "Used when an NPC has multiple ModelIDs",
-		position = 3
+		position = 3,
+		section = customSection
 	)
 	default int npcModelID2()
 	{
@@ -64,7 +76,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "npcModelID3",
 		name = "CUSTOM ModelID3",
 		description = "Used when an NPC has multiple ModelIDs",
-		position = 4
+		position = 4,
+		section = customSection
 	)
 	default int npcModelID3()
 	{
@@ -75,7 +88,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "npcModelID4",
 		name = "CUSTOM ModelID4",
 		description = "Used when an NPC has multiple ModelIDs",
-		position = 5
+		position = 5,
+		section = customSection
 	)
 	default int npcModelID4()
 	{
@@ -86,7 +100,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "npcModelID5",
 		name = "CUSTOM ModelID5",
 		description = "Used when an NPC has multiple ModelIDs",
-		position = 6
+		position = 6,
+		section = customSection
 	)
 	default int npcModelID5()
 	{
@@ -97,7 +112,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "npcModelID6",
 		name = "CUSTOM ModelID6",
 		description = "Used when an NPC has multiple ModelIDs",
-		position = 7
+		position = 7,
+		section = customSection
 	)
 	default int npcModelID6()
 	{
@@ -108,7 +124,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "npcModelID7",
 		name = "CUSTOM ModelID7",
 		description = "Used when an NPC has multiple ModelIDs",
-		position = 8
+		position = 8,
+		section = customSection
 	)
 	default int npcModelID7()
 	{
@@ -119,7 +136,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "npcModelID8",
 		name = "CUSTOM ModelID8",
 		description = "Used when an NPC has multiple ModelIDs",
-		position = 9
+		position = 9,
+		section = customSection
 	)
 	default int npcModelID8()
 	{
@@ -130,7 +148,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "npcModelID9",
 		name = "CUSTOM ModelID9",
 		description = "Used when an NPC has multiple ModelIDs",
-		position = 10
+		position = 10,
+		section = customSection
 	)
 	default int npcModelID9()
 	{
@@ -141,7 +160,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "npcModelID10",
 		name = "CUSTOM ModelID10",
 		description = "Used when an NPC has multiple ModelIDs",
-		position = 11
+		position = 11,
+		section = customSection
 	)
 	default int npcModelID10()
 	{
@@ -153,7 +173,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "standingAnimationId",
 		name = "Standing Animation ID",
 		description = "Enter the standingAnimation ID of the NPC",
-		position = 12
+		position = 12,
+		section = customSection
 	)
 	default int standingAnimationId()
 	{
@@ -164,7 +185,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "walkingAnimationId",
 		name = "Walking Animation ID",
 		description = "Enter the walkingAnimation ID of the NPC",
-		position = 13
+		position = 13,
+		section = customSection
 	)
 	default int walkingAnimationId()
 	{
@@ -176,7 +198,8 @@ public interface NpcFollowerConfig extends Config
 		name = "NPC Radius",
 		description = "Set the radius for the model, larger models will clip if it has a small radius set." +
 			"Rule of thumb: for each square the NPC takes up add 60.  eg) 1 tile NPC = 60, 3 tile NPC = 180",
-		position = 14
+		position = 14,
+		section = customSection
 	)
 	default int modelRadius()
 	{
@@ -188,7 +211,8 @@ public interface NpcFollowerConfig extends Config
 		name = "Offset X",
 		description = "Horizontal offset for the model.  Larger models will be too close if set to the default 0." +
 			"  Try increasing to find the position you want",
-		position = 15
+		position = 15,
+		section = customSection
 	)
 	default int offsetX()
 	{
@@ -200,7 +224,8 @@ public interface NpcFollowerConfig extends Config
 		name = "Offset Y",
 		description = "Vertical offset for the model.  Larger models will be too close if set to the default 0." +
 			"  Try increasing to find the position you want",
-		position = 16
+		position = 16,
+		section = customSection
 	)
 	default int offsetY()
 	{
@@ -211,7 +236,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "spawnAnimationID",
 		name = "Spawn Animation ID",
 		description = "Enter the spawn animation ID",
-		position = 17
+		position = 17,
+		section = customSection
 	)
 	default int spawnAnimationID()
 	{
@@ -233,7 +259,8 @@ public interface NpcFollowerConfig extends Config
 		keyName = "textLocation",
 		name = "Text Location",
 		description = "Enter where the text will be",
-		position = 18
+		position = 18,
+		section = customSection
 	)
 	default int textLocation()
 	{
