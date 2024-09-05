@@ -1,7 +1,5 @@
 package com.pettonpc;
 
-//import com.google.inject.Provides;
-
 import java.util.List;
 import net.runelite.api.Animation;
 import net.runelite.api.Client;
@@ -12,11 +10,8 @@ import net.runelite.api.RuneLiteObject;
 public class AnimationHandler
 {
 	private final Client client;
-	private final NpcFollowerConfig config;
-//	private ClientThread clientThread;
+	private final NpcFollowerPanel panel;
 	private List<RuneLiteObject> transmogObjects;
-//	private Thread animationThread;
-//	private NpcFollowerPlugin npcFollowerPlugin;
 	private int previousWalkingFrame = -1;
 	private int previousStandingFrame = -1;
 	private int currentFrame;
@@ -27,18 +22,12 @@ public class AnimationHandler
 		this.playerStateTracker = playerStateTracker;
 	}
 
-	public AnimationHandler(Client client, NpcFollowerConfig config, PlayerStateTracker playerStateTracker)
+	public AnimationHandler(Client client, NpcFollowerPanel panel, PlayerStateTracker playerStateTracker)
 	{
 		this.client = client;
-		this.config = config;
+		this.panel = panel;
 		this.playerStateTracker = playerStateTracker;
 	}
-
-//	@Provides
-//	NpcFollowerConfig provideConfig(ConfigManager configManager)
-//	{
-//		return configManager.getConfig(NpcFollowerConfig.class);
-//	}
 
 	public void setTransmogObjects(List<RuneLiteObject> transmogObjects)
 	{
@@ -47,7 +36,7 @@ public class AnimationHandler
 
 	public void triggerSpawnAnimation(NPC follower)
 	{
-		NpcData selectedNpc = config.selectedNpc();
+		NpcData selectedNpc = panel.getSelectedNpc();
 		int spawnAnimationId;
 		Animation spawnAnimation;
 
@@ -56,18 +45,16 @@ public class AnimationHandler
 			return;
 		}
 
-
-		if (!config.enableCustom())
+		if (!panel.enableCustom())
 		{
 			spawnAnimationId = selectedNpc.spawnAnim;
 		}
 		else
 		{
-			spawnAnimationId = config.spawnAnimationID();
+			spawnAnimationId = panel.getSpawnAnimationID();
 		}
 
 		spawnAnimation = client.loadAnimation(spawnAnimationId);
-
 
 		for (RuneLiteObject transmogObject : transmogObjects)
 		{
@@ -93,8 +80,8 @@ public class AnimationHandler
 			cancelCurrentAnimation();
 		}
 
-		NpcData selectedNpc = config.selectedNpc();
-		int walkingAnimationId = (config.enableCustom()) ? config.walkingAnimationId() : selectedNpc.getWalkAnim();
+		NpcData selectedNpc = panel.getSelectedNpc();
+		int walkingAnimationId = (panel.enableCustom()) ? panel.getWalkingAnimationId() : selectedNpc.getWalkAnim();
 		Animation walkingAnimation = client.loadAnimation(walkingAnimationId);
 
 		if (selectedNpc == null || walkingAnimation == null || follower == null)
@@ -127,15 +114,14 @@ public class AnimationHandler
 			return;
 		}
 
-		NpcData selectedNpc = config.selectedNpc();
+		NpcData selectedNpc = panel.getSelectedNpc();
 		if (selectedNpc == null)
 		{
 			return;
 		}
 
-		int standingAnimationId = (config.enableCustom()) ? config.standingAnimationId() : selectedNpc.getStandingAnim();
+		int standingAnimationId = (panel.enableCustom()) ? panel.getStandingAnimationId() : selectedNpc.getStandingAnim();
 		Animation standingAnimation = client.loadAnimation(standingAnimationId);
-//		NPC followerLoop = client.getFollower();
 
 		if (standingAnimation == null || follower == null)
 		{
@@ -160,11 +146,6 @@ public class AnimationHandler
 
 	public void cancelCurrentAnimation()
 	{
-//		if (animationThread != null && animationThread.isAlive())
-//		{
-//			animationThread.interrupt();
-//		}
-
 		for (RuneLiteObject transmogObject : transmogObjects)
 		{
 			if (transmogObject != null)
