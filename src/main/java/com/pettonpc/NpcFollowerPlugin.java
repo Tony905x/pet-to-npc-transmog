@@ -95,6 +95,16 @@ public class NpcFollowerPlugin extends Plugin
 
 		// Populate the dropdown on startup
 			panel.updateConfigDropdown(panel.getConfigDropdown());
+
+		// Ensure the checkbox state is correctly handled
+		if (panel.enableCustom())
+		{
+			System.out.println("Custom values enabled on startup");
+		}
+		else
+		{
+			System.out.println("Preset values enabled on startup");
+		}
 	}
 
 	@Override
@@ -116,6 +126,7 @@ public class NpcFollowerPlugin extends Plugin
 		hooks.unregisterRenderableDrawListener(drawListener);
 		initializeVariables();
 		clientToolbar.removeNavigation(navButton);
+
 	}
 
 	@Subscribe
@@ -169,6 +180,7 @@ public class NpcFollowerPlugin extends Plugin
 
 	private RuneLiteObject initializeTransmogObject(NPC follower)
 	{
+		transmogObjects.clear();
 		// Set old transmog objects to inactive and finished
 		for (RuneLiteObject transmogObject : transmogObjects)
 		{
@@ -176,20 +188,22 @@ public class NpcFollowerPlugin extends Plugin
 			transmogObject.setFinished(true);
 		}
 
-		transmogObjects.clear();
-		if (playerStateTracker != null) {
+//		if (playerStateTracker != null) {
 			playerStateTracker.setTransmogObjects(transmogObjects);
-		}
-		if (animationHandler != null) {
+//		}
+//		if (animationHandler != null) {
 			animationHandler.setTransmogObjects(transmogObjects);
-		}
+//		}
 
 		RuneLiteObject transmogObject = client.createRuneLiteObject();
 		NpcData selectedNpc = panel.getSelectedNpc(); // Use panel instead of config
 
+
+		System.out.println("initialize method transmog state" + transmogObject );
+
 		if (transmogObject != null)
 		{
-			Model mergedModel = createNpcModel();
+			Model mergedModel = createNpcModel(selectedNpc);
 			if (mergedModel != null)
 			{
 				transmogObject.setModel(mergedModel);
@@ -197,11 +211,13 @@ public class NpcFollowerPlugin extends Plugin
 				transmogObject.setActive(true);
 				if (panel.enableCustom()) // Use panel instead of config
 				{
+					System.out.println("Intialize Using custom radius values");
 					transmogObject.setRadius(panel.getModelRadius()); // Use panel instead of config
 				}
 				else
 				{
-					transmogObject.setRadius(selectedNpc.radius);
+					System.out.println("Initiailize Using preset radius values");
+					transmogObject.setRadius(selectedNpc.getRadius());
 				}
 				if (playerStateTracker != null) {
 					playerStateTracker.setTransmogObjects(transmogObjects);
@@ -217,13 +233,72 @@ public class NpcFollowerPlugin extends Plugin
 		return transmogObject;
 	}
 
+
+//	@Subscribe
+public void onConfigChanged()
+{
+	NpcData selectedNpc = panel.getSelectedNpc(); // Use the selected NPC from the dropdown
+	List<Integer> modelIds = selectedNpc.getModelIDs();
+
+	// Update the panel fields based on the custom option
+	if (panel.enableCustom())
+	{
+		String configName = (String) panel.getConfigDropdown().getSelectedItem();
+		panel.updateFieldsWithDropdownData(configName);
+	}
+	else
+	{
+		panel.updateFieldsWithNpcData(selectedNpc);
+	}
+
+
+	clientThread.invokeLater(() -> {
+		Model mergedModel = createNpcModel(selectedNpc); // Pass the selected NPC to createNpcModel
+		if (mergedModel != null)
+		{
+			if (!transmogObjects.isEmpty())
+			{
+				RuneLiteObject transmogObject = transmogObjects.get(0);
+				transmogObject.setModel(mergedModel);
+				transmogObject.setActive(true);
+				if (panel.enableCustom())
+				{
+					System.out.println("Using custom radius values");
+					transmogObject.setRadius(panel.getModelRadius());
+				}
+				else
+				{
+					System.out.println("Using preset radius values");
+					transmogObject.setRadius(selectedNpc.getRadius());
+				}
+				playerStateTracker.setTransmogObjects(transmogObjects);
+				animationHandler.setTransmogObjects(transmogObjects);
+
+				NPC follower = client.getFollower();
+				playerStateTracker.setCurrentState(PlayerState.SPAWNING);
+			}
+		}
+	});
+}
+
+
 	private void updateTransmogObject(NPC follower)
 	{
 		WorldView worldView = client.getTopLevelWorldView();
 		LocalPoint followerLocation = follower.getLocalLocation();
 
-		int offsetX = panel.getOffsetX() * TILE_TO_LOCAL_UNIT; // Use panel instead of config
-		int offsetY = panel.getOffsetY() * TILE_TO_LOCAL_UNIT; // Use panel instead of config
+		int offsetX, offsetY;
+		if (panel.enableCustom()) // Check if custom option is enabled
+		{
+			offsetX = panel.getOffsetX() * TILE_TO_LOCAL_UNIT; // Use panel values
+			offsetY = panel.getOffsetY() * TILE_TO_LOCAL_UNIT; // Use panel values
+		}
+		else
+		{
+			NpcData selectedNpc = panel.getSelectedNpc(); // Get the selected NPC from the enum
+			offsetX = selectedNpc.getOffsetX() * TILE_TO_LOCAL_UNIT; // Use preset values from the enum
+			offsetY = selectedNpc.getOffsetY() * TILE_TO_LOCAL_UNIT; // Use preset values from the enum
+		}
 
 		int newX = followerLocation.getX() + offsetX;
 		int newY = followerLocation.getY() + offsetY;
@@ -234,7 +309,7 @@ public class NpcFollowerPlugin extends Plugin
 		int dy = player.getLocalLocation().getY() - newY;
 		int angle;
 
-		if (panel.getOffsetX() == 0 && panel.getOffsetY() == 0) // Use panel instead of config
+		if (offsetX == 0 && offsetY == 0) // Check if offsets are zero
 		{
 			angle = follower.getCurrentOrientation();
 		}
@@ -264,13 +339,14 @@ public class NpcFollowerPlugin extends Plugin
 		}
 	}
 
-	public Model createNpcModel()
+
+	public Model createNpcModel(NpcData selectedNpc)
 	{
-		NpcData selectedNpc = panel.getSelectedNpc(); // Use panel instead of config
 		List<Integer> modelIds = new ArrayList<>();
 
 		if (panel.enableCustom()) // Use panel instead of config
 		{
+			System.out.println("Using custom model IDs");
 			int[] npcModelIDs = {panel.getNpcModelID1(), panel.getNpcModelID2(), panel.getNpcModelID3(), panel.getNpcModelID4(), panel.getNpcModelID5(), panel.getNpcModelID6(), panel.getNpcModelID7(), panel.getNpcModelID8(), panel.getNpcModelID9(), panel.getNpcModelID10()}; // Use panel instead of config
 
 			for (int modelId : npcModelIDs)
@@ -283,6 +359,7 @@ public class NpcFollowerPlugin extends Plugin
 		}
 		else
 		{
+			System.out.println("Using preset model IDs");
 			modelIds.addAll(selectedNpc.getModelIDs());
 		}
 
@@ -290,6 +367,7 @@ public class NpcFollowerPlugin extends Plugin
 
 		if (modelIds.isEmpty())
 		{
+			System.out.println("if (modelIds.isEmpty)");
 			return null;
 		}
 
@@ -297,23 +375,28 @@ public class NpcFollowerPlugin extends Plugin
 
 		if (Arrays.stream(modelDataArray).anyMatch(Objects::isNull))
 		{
+			System.out.println("if (Arrays.stream(modelDataArray).anyMatch(Objects::isNull))");
 			return null;
 		}
 
 		ModelData mergedModelData = client.mergeModels(modelDataArray);
 		if (mergedModelData == null)
 		{
+			System.out.println("if (mergedModelData == null)");
 			return null;
 		}
 
 		Model finalModel = mergedModelData.light();
 		if (finalModel == null)
 		{
+			System.out.println("if (finalModel == null)");
 			return null;
 		}
-
+		System.out.println("return finalModel;");
 		return finalModel;
 	}
+
+
 
 
 	public void setTransmogObjects(List<RuneLiteObject> transmogObjects) {
@@ -333,13 +416,24 @@ public class NpcFollowerPlugin extends Plugin
 		return true;
 	}
 
+
+
+
 	public void saveConfiguration(String name, String... npcModelIDs)
 	{
 		for (int i = 0; i < npcModelIDs.length; i++)
 		{
-//			panel.saveConfiguration(name, npcModelIDs[i], i + 1); // Use panel instead of configManager
 			panel.saveConfiguration(name, npcModelIDs[i], i + 1); // Use panel instead of configManager
 		}
+
+		// Save additional fields
+		panel.saveConfiguration(name, "npcStandingAnim", panel.getStandingAnimationId());
+		panel.saveConfiguration(name, "npcWalkingAnim", panel.getWalkingAnimationId());
+		panel.saveConfiguration(name, "npcSpawnAnim", panel.getSpawnAnimationID());
+		panel.saveConfiguration(name, "npcRadius", panel.getModelRadius());
+		panel.saveConfiguration(name, "npcXoffset", panel.getOffsetX());
+		panel.saveConfiguration(name, "npcYoffset", panel.getOffsetY());
+
 		updateSavedConfigNames(name);
 	}
 
@@ -388,6 +482,42 @@ public class NpcFollowerPlugin extends Plugin
 		}
 		String savedConfigNames = panel.getSavedConfigNames(); // Use panel instead of configManager
 		return savedConfigNames != null ? savedConfigNames : "";
+	}
+
+	public void deleteConfiguration(String name)
+	{
+		// Remove the configuration using the provided name
+		for (int i = 1; i <= 10; i++)
+		{
+			configManager.unsetConfiguration("petToNpcTransmog", name + "_npcModelID" + i);
+		}
+		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcStandingAnim");
+		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcWalkingAnim");
+		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcSpawnAnim");
+		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcRadius");
+		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcXoffset");
+		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcYoffset");
+		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcTextLocation");
+
+		// Update the saved configuration names
+		String savedConfigNames = panel.getSavedConfigNames();
+		if (savedConfigNames != null && !savedConfigNames.isEmpty())
+		{
+			String[] configNames = savedConfigNames.split(",");
+			StringBuilder updatedConfigNames = new StringBuilder();
+			for (String configName : configNames)
+			{
+				if (!configName.equals(name))
+				{
+					if (updatedConfigNames.length() > 0)
+					{
+						updatedConfigNames.append(",");
+					}
+					updatedConfigNames.append(configName);
+				}
+			}
+			panel.setSavedConfigNames(updatedConfigNames.toString());
+		}
 	}
 
 //	private void reinitializeTransmogObjects()
