@@ -1,12 +1,16 @@
 package com.pettonpc;
 
+import java.awt.image.BufferedImage;
 import javax.swing.border.EmptyBorder;
 import net.runelite.client.ui.PluginPanel;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.util.ImageUtil;
 
 public class NpcFollowerPanel extends PluginPanel
 {
@@ -35,10 +39,11 @@ public class NpcFollowerPanel extends PluginPanel
 	private JTextField npcStandingAnim;
 	private JTextField npcWalkingAnim;
 	private JTextField npcSpawnAnim;
-	private JTextField npcRadius;
-	private JTextField npcXoffset;
-	private JTextField npcYoffset;
-	private JTextField configNameField;
+//	private JTextField npcRadius;
+	private JSlider npcRadiusSlider;
+	private JSlider npcXoffsetSlider;
+	private JSlider npcYoffsetSlider;
+//	private JTextField configNameField;
 	private JButton saveButton;
 	private JButton deleteButton;
 
@@ -65,12 +70,36 @@ public class NpcFollowerPanel extends PluginPanel
 		npcStandingAnim = new JTextField();
 		npcWalkingAnim = new JTextField();
 		npcSpawnAnim = new JTextField();
-		npcRadius = new JTextField();
-		npcXoffset = new JTextField();
-		npcYoffset = new JTextField();
-		configNameField = new JTextField();
+//		npcRadius = new JTextField();
+		npcRadiusSlider = new JSlider(0, 5, 0); // Min value: 0, Max value: 5, Initial value: 0
+		npcXoffsetSlider = new JSlider(0, 5, 0); // Min value: 0, Max value: 5, Initial value: 0
+		npcYoffsetSlider = new JSlider(0, 5, 0); // Min value: 0, Max value: 5, Initial value: 0
+//		configNameField = new JTextField();
 		saveButton = new JButton("Save Configuration");
 		deleteButton = new JButton("Delete Configuration");
+
+		// Add change listeners to update the values when the slider is moved
+		npcRadiusSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				System.out.println("Radius " + npcRadiusSlider.getValue());
+			}
+		});
+
+
+		npcXoffsetSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				System.out.println("X Offset: " + npcXoffsetSlider.getValue());
+			}
+		});
+
+		npcYoffsetSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				System.out.println("Y Offset: " + npcYoffsetSlider.getValue());
+			}
+		});
 
 		// Create panels
 		JPanel mainPanel = new JPanel(new GridLayout(0, 2, 5, 5));
@@ -83,6 +112,7 @@ public class NpcFollowerPanel extends PluginPanel
 		titleLabel.setFont(new Font("Arial Narrow", Font.BOLD, 16));
 		add(titleLabel, BorderLayout.NORTH);
 		titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Add gap above and below the title
+
 
 		// Add components to main panel
 		addLabelAndField(mainPanel, "NPC Presets:", npcPresetDropdown);
@@ -101,11 +131,12 @@ public class NpcFollowerPanel extends PluginPanel
 		addLabelAndField(mainPanel, "Standing Animation ID:", npcStandingAnim);
 		addLabelAndField(mainPanel, "Walking Animation ID:", npcWalkingAnim);
 		addLabelAndField(mainPanel, "Spawn Animation ID:", npcSpawnAnim);
-		addLabelAndField(mainPanel, "NPC Radius:", npcRadius);
-		addLabelAndField(mainPanel, "Xoffset:", npcXoffset);
-		addLabelAndField(mainPanel, "Yoffset:", npcYoffset);
-		addLabelAndField(mainPanel, "Configuration Name:", configNameField);
-		configNameField.setToolTipText("Enter configuration name to be saved under");
+//		addLabelAndField(mainPanel, "NPC Radius:", npcRadius);
+		addLabelAndField(mainPanel, "NPC Radius:", npcRadiusSlider);
+		addLabelAndField(mainPanel, "X Offset:", npcXoffsetSlider);
+		addLabelAndField(mainPanel, "Y Offset:", npcYoffsetSlider);
+//		addLabelAndField(mainPanel, "Configuration Name:", configNameField);
+//		configNameField.setToolTipText("Enter configuration name to be saved under");
 
 		// Add buttons to button panel
 		buttonPanel.add(saveButton);
@@ -133,12 +164,16 @@ public class NpcFollowerPanel extends PluginPanel
 		// Handle saving values
 		saveButton.addActionListener(e -> {
 			System.out.println("entered saving method");
-			String configName = configNameField.getText();
-			if (configName.isEmpty())
+
+			// Show input dialog to get the configuration name
+			String configName = JOptionPane.showInputDialog(null, "Enter configuration name:", "Save Configuration", JOptionPane.PLAIN_MESSAGE);
+
+			if (configName == null || configName.isEmpty())
 			{
 				JOptionPane.showMessageDialog(null, "Please enter a name for the configuration before saving.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+
 			System.out.println("Saving fields!");
 			plugin.saveConfiguration(
 				configName,
@@ -155,13 +190,22 @@ public class NpcFollowerPanel extends PluginPanel
 				npcStandingAnim.getText(),
 				npcWalkingAnim.getText(),
 				npcSpawnAnim.getText(),
-				npcRadius.getText(),
-				npcXoffset.getText(),
-				npcYoffset.getText()
+				String.valueOf(getModelRadius()), // Save slider value as String
+				String.valueOf(npcXoffsetSlider.getValue()), // Save slider value as String
+				String.valueOf(npcYoffsetSlider.getValue())  // Save slider value as String
 			);
 			System.out.println("updating the config dropdown from save button");
 			updateConfigDropdown(configDropdown);
+
+			// Set the newly saved configuration as the selected item
+			configDropdown.setSelectedItem(configName);
+
+			// Load the newly saved configuration
+			plugin.loadConfiguration(configName, npcModelID1Field, npcModelID2Field, npcModelID3Field, npcModelID4Field, npcModelID5Field, npcModelID6Field, npcModelID7Field, npcModelID8Field, npcModelID9Field, npcModelID10Field);
+			plugin.loadSliderConfiguration(configName, npcRadiusSlider, npcXoffsetSlider, npcYoffsetSlider);
+			plugin.onConfigChanged();
 		});
+
 
 		// Handle deleting values
 		deleteButton.addActionListener(e -> {
@@ -194,10 +238,14 @@ public class NpcFollowerPanel extends PluginPanel
 					npcModelID10Field,
 					npcStandingAnim,
 					npcWalkingAnim,
-					npcSpawnAnim,
-					npcRadius,
-					npcXoffset,
-					npcYoffset
+					npcSpawnAnim
+//					npcRadius
+				);
+				plugin.loadSliderConfiguration(
+					selectedConfig,
+					npcRadiusSlider,
+					npcXoffsetSlider,
+					npcYoffsetSlider
 				);
 				plugin.onConfigChanged();
 			}
@@ -263,17 +311,18 @@ public class NpcFollowerPanel extends PluginPanel
 
 	public int getModelRadius()
 	{
-		return parseIntegerField(npcRadius, DEFAULT_RADIUS);
+		// Each slider step represents an increment of 60
+		return (npcRadiusSlider.getValue() + 1) * 60;
 	}
 
 	public int getOffsetX()
 	{
-		return parseIntegerField(npcXoffset, DEFAULT_OFFSET);
+		return npcXoffsetSlider.getValue();
 	}
 
 	public int getOffsetY()
 	{
-		return parseIntegerField(npcYoffset, DEFAULT_OFFSET);
+		return npcYoffsetSlider.getValue();
 	}
 
 	public int getNpcModelID1()
@@ -401,33 +450,59 @@ public class NpcFollowerPanel extends PluginPanel
 		npcStandingAnim.setText(String.valueOf(npcData.getStandingAnim()));
 		npcWalkingAnim.setText(String.valueOf(npcData.getWalkAnim()));
 		npcSpawnAnim.setText(String.valueOf(npcData.getSpawnAnim()));
-		npcRadius.setText(String.valueOf(npcData.getRadius()));
-		npcXoffset.setText(String.valueOf(npcData.getOffsetX()));
-		npcYoffset.setText(String.valueOf(npcData.getOffsetY()));
+//		npcRadius.setText(String.valueOf(npcData.getRadius()));
+		npcRadiusSlider.setValue(npcData.getRadius());
+		npcXoffsetSlider.setValue(npcData.getOffsetX());
+		npcYoffsetSlider.setValue(npcData.getOffsetY());
 	}
 
 	public void updateFieldsWithDropdownData(String configName)
 	{
-		npcModelID1Field.setText(loadConfiguration(configName, 1));
-		npcModelID2Field.setText(loadConfiguration(configName, 2));
-		npcModelID3Field.setText(loadConfiguration(configName, 3));
-		npcModelID4Field.setText(loadConfiguration(configName, 4));
-		npcModelID5Field.setText(loadConfiguration(configName, 5));
-		npcModelID6Field.setText(loadConfiguration(configName, 6));
-		npcModelID7Field.setText(loadConfiguration(configName, 7));
-		npcModelID8Field.setText(loadConfiguration(configName, 8));
-		npcModelID9Field.setText(loadConfiguration(configName, 9));
-		npcModelID10Field.setText(loadConfiguration(configName, 10));
+		npcModelID1Field.setText(loadConfiguration(configName, "npcModelID1"));
+		npcModelID2Field.setText(loadConfiguration(configName, "npcModelID2"));
+		npcModelID3Field.setText(loadConfiguration(configName, "npcModelID3"));
+		npcModelID4Field.setText(loadConfiguration(configName, "npcModelID4"));
+		npcModelID5Field.setText(loadConfiguration(configName, "npcModelID5"));
+		npcModelID6Field.setText(loadConfiguration(configName, "npcModelID6"));
+		npcModelID7Field.setText(loadConfiguration(configName, "npcModelID7"));
+		npcModelID8Field.setText(loadConfiguration(configName, "npcModelID8"));
+		npcModelID9Field.setText(loadConfiguration(configName, "npcModelID9"));
+		npcModelID10Field.setText(loadConfiguration(configName, "npcModelID10"));
 		npcStandingAnim.setText(loadConfiguration(configName, "npcStandingAnim"));
 		npcWalkingAnim.setText(loadConfiguration(configName, "npcWalkingAnim"));
 		npcSpawnAnim.setText(loadConfiguration(configName, "npcSpawnAnim"));
-		npcRadius.setText(loadConfiguration(configName, "npcRadius"));
-		npcXoffset.setText(loadConfiguration(configName, "npcXoffset"));
-		npcYoffset.setText(loadConfiguration(configName, "npcYoffset"));
+//		npcRadius.setText(loadConfiguration(configName, "npcRadius"));
+//		npcRadiusSlider.setValue(Integer.parseInt(loadConfiguration(configName, "npcRadius")));
+
+		// Load and set the radius value
+		String radiusValue = loadConfiguration(configName, "npcRadius");
+		if (radiusValue != null)
+		{
+			int radius = Integer.parseInt(radiusValue);
+			int sliderValue = (radius / 60) - 1;
+			npcRadiusSlider.setValue(sliderValue);
+		}
+		else
+		{
+			npcRadiusSlider.setValue(0); // Set a default value if the configuration value is null
+		}
+
+		npcXoffsetSlider.setValue(Integer.parseInt(loadConfiguration(configName, "npcXoffset")));
+		npcYoffsetSlider.setValue(Integer.parseInt(loadConfiguration(configName, "npcYoffset")));
+
+		// Debugging
+		System.out.println("Loaded Configuration: " + configName);
+		System.out.println("Standing Anim: " + npcStandingAnim.getText());
+		System.out.println("Walking Anim: " + npcWalkingAnim.getText());
+		System.out.println("Spawn Anim: " + npcSpawnAnim.getText());
+		System.out.println("Radius: " + npcRadiusSlider.getValue());
+		System.out.println("X Offset: " + npcXoffsetSlider.getValue());
+		System.out.println("Y Offset: " + npcYoffsetSlider.getValue());
 	}
 
 	public void toggleCustomFields(boolean enable)
 	{
+		npcPresetDropdown.setEnabled(!enable);
 		configDropdown.setEnabled(enable);
 		npcModelID1Field.setEnabled(enable);
 		npcModelID2Field.setEnabled(enable);
@@ -442,11 +517,11 @@ public class NpcFollowerPanel extends PluginPanel
 		npcStandingAnim.setEnabled(enable);
 		npcWalkingAnim.setEnabled(enable);
 		npcSpawnAnim.setEnabled(enable);
-		npcRadius.setEnabled(enable);
-		npcXoffset.setEnabled(enable);
-		npcYoffset.setEnabled(enable);
+		npcRadiusSlider.setEnabled(enable);
+		npcXoffsetSlider.setEnabled(enable);
+		npcYoffsetSlider.setEnabled(enable);
+//		configNameField.setEnabled(enable);
 		saveButton.setEnabled(enable);
 		deleteButton.setEnabled(enable);
-		configNameField.setEnabled(enable);
 	}
 }
