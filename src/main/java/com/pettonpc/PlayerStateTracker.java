@@ -12,8 +12,8 @@ public class PlayerStateTracker
 {
 	@Inject
 	private OverlayManager overlayManager;
-	@Inject
-	private TextOverlay textOverlay;
+//	@Inject
+//	private TextOverlay textOverlay;
 
 	private PlayerState currentState;
 	private final Client client;

@@ -77,6 +77,13 @@ public class NpcFollowerPlugin extends Plugin
 		return transmogObjects;
 	}
 
+//	@Provides
+//	NpcFollowerConfig provideConfig(ConfigManager configManager)
+//	{
+//		return configManager.getConfig(NpcFollowerConfig.class);
+//	}
+
+
 	@Override
 	protected void startUp()
 	{
