@@ -17,13 +17,13 @@ public class PlayerStateTracker
 
 	private PlayerState currentState;
 	private final Client client;
-	private final AnimationHandler animationHandler;
+	private final AnimationManager animationManager;
 	private List<RuneLiteObject> transmogObjects;
 
-	public PlayerStateTracker(Client client, AnimationHandler animationHandler, NpcFollowerPlugin npcFollowerPlugin)
+	public PlayerStateTracker(Client client, AnimationManager animationManager, NpcFollowerPlugin npcFollowerPlugin)
 	{
 		this.client = client;
-		this.animationHandler = animationHandler;
+		this.animationManager = animationManager;
 	}
 
 	public List<RuneLiteObject> getTransmogObjects() {
@@ -67,7 +67,7 @@ public class PlayerStateTracker
 
 		if (newState != currentState)
 		{
-			animationHandler.cancelCurrentAnimation();
+			animationManager.cancelCurrentAnimation();
 		}
 
 		currentState = newState;
@@ -79,13 +79,13 @@ public class PlayerStateTracker
 		switch (currentState)
 		{
 			case MOVING:
-				animationHandler.handleWalkingAnimation(follower);
+				animationManager.handleWalkingAnimation(follower);
 				break;
 			case STANDING:
-				animationHandler.handleStandingAnimation(follower);
+				animationManager.handleStandingAnimation(follower);
 				break;
 			case SPAWNING:
-				animationHandler.triggerSpawnAnimation(follower);
+				animationManager.triggerSpawnAnimation(follower);
 				break;
 			case IDLE:
 				updateFollowerMovement(follower);

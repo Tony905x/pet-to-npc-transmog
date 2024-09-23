@@ -1,21 +1,16 @@
 package com.pettonpc;
 
-import java.awt.image.BufferedImage;
 import javax.swing.border.EmptyBorder;
 import net.runelite.client.ui.PluginPanel;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.util.ImageUtil;
 
 public class NpcFollowerPanel extends PluginPanel
 {
 	private final NpcFollowerPlugin plugin;
 	private final ConfigManager configManager;
+	private final DataManager dataManager;
 	private JComboBox<String> npcPresetDropdown;
 	private JCheckBox enableCustomCheckbox;
 	private JComboBox<String> configDropdown;
@@ -36,11 +31,15 @@ public class NpcFollowerPanel extends PluginPanel
 	private static final int DEFAULT_WALKING_ANIM = 11474;
 	private static final int DEFAULT_SPAWN_ANIM = 0;
 
-	public NpcFollowerPanel(NpcFollowerPlugin plugin, ConfigManager configManager)
+
+	public NpcFollowerPanel(NpcFollowerPlugin plugin, ConfigManager configManager, DataManager dataManager)
 	{
 		this.plugin = plugin;
 		this.configManager = configManager;
+		this.dataManager = dataManager;
 		setLayout(new BorderLayout());
+
+
 
 		// Create components
 		JLabel titleLabel = new JLabel("<html><font color='orange'><u>Pet-To-NPC Transmog</u></font></html>");
@@ -240,7 +239,7 @@ public class NpcFollowerPanel extends PluginPanel
 				String.valueOf(npcYoffsetSlider.getValue())  // Save slider value as String
 			);
 			System.out.println("updating the config dropdown from save button");
-			updateConfigDropdown(configDropdown);
+			dataManager.updateConfigDropdown(configDropdown);
 
 			// Set the newly saved configuration as the selected item
 			configDropdown.setSelectedItem(configName);
@@ -261,7 +260,7 @@ public class NpcFollowerPanel extends PluginPanel
 			{
 				System.out.println("Deleting configuration: " + selectedConfig);
 				plugin.deleteConfiguration(selectedConfig);
-				updateConfigDropdown(configDropdown);
+				dataManager.updateConfigDropdown(configDropdown);
 			}
 		});
 
@@ -292,24 +291,38 @@ public class NpcFollowerPanel extends PluginPanel
 		panel.add(field);
 	}
 
-	private void initializeConfigDropdown()
-	{
-		updateConfigDropdown(configDropdown);
-	}
 
-	public void updateConfigDropdown(JComboBox<String> configDropdown)
-	{
-		configDropdown.removeAllItems();
-		String savedConfigNames = plugin.getSavedConfigNames();
-		if (savedConfigNames != null && !savedConfigNames.isEmpty())
+	// Initialize config dropdown
+	private void initializeConfigDropdown() {
+		System.out.println("Panel before null check");
+
+		if (dataManager != null)
 		{
-			String[] configNames = savedConfigNames.split(",");
-			for (String configName : configNames)
-			{
-				configDropdown.addItem(configName);
-			}
+			System.out.println("Panel after null check");
+			dataManager.initializeConfigDropdown(configDropdown);
 		}
 	}
+
+
+
+//	private void initializeConfigDropdown()
+//	{
+//		updateConfigDropdown(configDropdown);
+//	}
+//
+//	public void updateConfigDropdown(JComboBox<String> configDropdown)
+//	{
+//		configDropdown.removeAllItems();
+//		String savedConfigNames = dataManager.getSavedConfigNames();
+//		if (savedConfigNames != null && !savedConfigNames.isEmpty())
+//		{
+//			String[] configNames = savedConfigNames.split(",");
+//			for (String configName : configNames)
+//			{
+//				configDropdown.addItem(configName);
+//			}
+//		}
+//	}
 
 	private void populateNpcPresetDropdown()
 	{
@@ -428,35 +441,8 @@ public class NpcFollowerPanel extends PluginPanel
 		return Integer.parseInt(text);
 	}
 
-	public void saveConfiguration(String name, String key, int value)
-	{
-		configManager.setConfiguration("petToNpcTransmog", name + "_" + key, String.valueOf(value));
-	}
 
-	public void saveConfiguration(String name, String key, String value)
-	{
-		configManager.setConfiguration("petToNpcTransmog", name + "_" + key, value);
-	}
 
-	public String loadConfiguration(String name, int index)
-	{
-		return configManager.getConfiguration("petToNpcTransmog", name + "_npcModelID" + index);
-	}
-
-	public String loadConfiguration(String name, String key)
-	{
-		return configManager.getConfiguration("petToNpcTransmog", name + "_" + key);
-	}
-
-	public String getSavedConfigNames()
-	{
-		return configManager.getConfiguration("petToNpcTransmog", "savedConfigNames");
-	}
-
-	public void setSavedConfigNames(String savedConfigNames)
-	{
-		configManager.setConfiguration("petToNpcTransmog", "savedConfigNames", savedConfigNames);
-	}
 
 	public JComboBox<String> getConfigDropdown()
 	{
@@ -485,22 +471,22 @@ public class NpcFollowerPanel extends PluginPanel
 
 	public void updateFieldsWithDropdownData(String configName)
 	{
-		npcModelIDFields[0].setText(loadConfiguration(configName, "npcModelID1"));
-		npcModelIDFields[1].setText(loadConfiguration(configName, "npcModelID2"));
-		npcModelIDFields[2].setText(loadConfiguration(configName, "npcModelID3"));
-		npcModelIDFields[3].setText(loadConfiguration(configName, "npcModelID4"));
-		npcModelIDFields[4].setText(loadConfiguration(configName, "npcModelID5"));
-		npcModelIDFields[5].setText(loadConfiguration(configName, "npcModelID6"));
-		npcModelIDFields[6].setText(loadConfiguration(configName, "npcModelID7"));
-		npcModelIDFields[7].setText(loadConfiguration(configName, "npcModelID8"));
-		npcModelIDFields[8].setText(loadConfiguration(configName, "npcModelID9"));
-		npcModelIDFields[9].setText(loadConfiguration(configName, "npcModelID10"));
-		npcStandingAnim.setText(loadConfiguration(configName, "npcStandingAnim"));
-		npcWalkingAnim.setText(loadConfiguration(configName, "npcWalkingAnim"));
-		npcSpawnAnim.setText(loadConfiguration(configName, "npcSpawnAnim"));
+		npcModelIDFields[0].setText(plugin.loadConfiguration(configName, "npcModelID1"));
+		npcModelIDFields[1].setText(plugin.loadConfiguration(configName, "npcModelID2"));
+		npcModelIDFields[2].setText(plugin.loadConfiguration(configName, "npcModelID3"));
+		npcModelIDFields[3].setText(plugin.loadConfiguration(configName, "npcModelID4"));
+		npcModelIDFields[4].setText(plugin.loadConfiguration(configName, "npcModelID5"));
+		npcModelIDFields[5].setText(plugin.loadConfiguration(configName, "npcModelID6"));
+		npcModelIDFields[6].setText(plugin.loadConfiguration(configName, "npcModelID7"));
+		npcModelIDFields[7].setText(plugin.loadConfiguration(configName, "npcModelID8"));
+		npcModelIDFields[8].setText(plugin.loadConfiguration(configName, "npcModelID9"));
+		npcModelIDFields[9].setText(plugin.loadConfiguration(configName, "npcModelID10"));
+		npcStandingAnim.setText(plugin.loadConfiguration(configName, "npcStandingAnim"));
+		npcWalkingAnim.setText(plugin.loadConfiguration(configName, "npcWalkingAnim"));
+		npcSpawnAnim.setText(plugin.loadConfiguration(configName, "npcSpawnAnim"));
 
 		// Load and set the radius value
-		String radiusValue = loadConfiguration(configName, "npcRadius");
+		String radiusValue = plugin.loadConfiguration(configName, "npcRadius");
 		if (radiusValue != null)
 		{
 			int radius = Integer.parseInt(radiusValue);
@@ -512,8 +498,8 @@ public class NpcFollowerPanel extends PluginPanel
 			npcRadiusSlider.setValue(0); // Set a default value if the configuration value is null
 		}
 
-		npcXoffsetSlider.setValue(Integer.parseInt(loadConfiguration(configName, "npcXoffset")));
-		npcYoffsetSlider.setValue(Integer.parseInt(loadConfiguration(configName, "npcYoffset")));
+		npcXoffsetSlider.setValue(Integer.parseInt(plugin.loadConfiguration(configName, "npcXoffset")));
+		npcYoffsetSlider.setValue(Integer.parseInt(plugin.loadConfiguration(configName, "npcYoffset")));
 
 		// Debugging
 		System.out.println("Loaded Configuration: " + configName);

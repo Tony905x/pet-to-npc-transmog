@@ -7,7 +7,7 @@ import net.runelite.api.NPC;
 import net.runelite.api.RuneLiteObject;
 
 @SuppressWarnings("LombokSetterMayBeUsed")
-public class AnimationHandler
+public class AnimationManager
 {
 	private final Client client;
 	private final NpcFollowerPanel panel;
@@ -22,7 +22,7 @@ public class AnimationHandler
 		this.playerStateTracker = playerStateTracker;
 	}
 
-	public AnimationHandler(Client client, NpcFollowerPanel panel, PlayerStateTracker playerStateTracker)
+	public AnimationManager(Client client, NpcFollowerPanel panel, PlayerStateTracker playerStateTracker)
 	{
 		this.client = client;
 		this.panel = panel;
