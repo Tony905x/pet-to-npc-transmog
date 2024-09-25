@@ -17,9 +17,6 @@ public class DataManager
 		this.configManager = configManager;
 	}
 
-
-
-
 	public void saveConfiguration(String name, String key, int value) {
 		configManager.setConfiguration("petToNpcTransmog", name + "_" + key, String.valueOf(value));
 	}

@@ -139,11 +139,15 @@ public class NpcFollowerPlugin extends Plugin
 
 		// Populate the dropdown on startup
 
-		if (client.getGameState() != GameState.LOGGED_IN)
+//		if (client.getGameState() != GameState.LOGGED_IN)
+//		{
+//			if (dataManager != null){
+//			dataManager.updateConfigDropdown(panel.getConfigDropdown());
+//			}
+//		}
+		if (panel != null)
 		{
-			if (dataManager != null){
-			dataManager.updateConfigDropdown(panel.getConfigDropdown());
-			}
+			panel.loadLastConfiguration();
 		}
 	}
 
@@ -401,7 +405,7 @@ public void onConfigChanged()
 
 		if (panel.enableCustom()) // Use panel instead of config
 		{
-			System.out.println("Using custom model IDs");
+//			System.out.println("Using custom model IDs");
 			int[] npcModelIDs = {panel.getNpcModelID1(), panel.getNpcModelID2(), panel.getNpcModelID3(), panel.getNpcModelID4(), panel.getNpcModelID5(), panel.getNpcModelID6(), panel.getNpcModelID7(), panel.getNpcModelID8(), panel.getNpcModelID9(), panel.getNpcModelID10()}; // Use panel instead of config
 
 			for (int modelId : npcModelIDs)
@@ -414,11 +418,11 @@ public void onConfigChanged()
 		}
 		else
 		{
-			System.out.println("Using preset model IDs");
+//			System.out.println("Using preset model IDs");
 			modelIds.addAll(selectedNpc.getModelIDs());
 		}
 
-		System.out.println("Model IDs: " + modelIds); // Add logging to trace model IDs
+//		System.out.println("Model IDs: " + modelIds); // Add logging to trace model IDs
 
 		if (modelIds.isEmpty())
 		{

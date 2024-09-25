@@ -197,12 +197,14 @@ public class NpcFollowerPanel extends PluginPanel
 		npcPresetDropdown.addActionListener(e -> {
 			System.out.println("preset dropdown listener");
 			plugin.onConfigChanged();
+			saveCurrentConfiguration();
 		});
 
 		enableCustomCheckbox.addActionListener(e -> {
 			System.out.println("custom button listener");
 			plugin.onConfigChanged();
 			toggleCustomFields(enableCustomCheckbox.isSelected());
+			saveCurrentConfiguration();
 		});
 
 		// Handle saving values
@@ -267,12 +269,13 @@ public class NpcFollowerPanel extends PluginPanel
 		// Add ActionListener to configDropdown
 		configDropdown.addActionListener(e -> {
 			String selectedConfig = (String) configDropdown.getSelectedItem();
-			if (selectedConfig != null && plugin != null)
+			if (selectedConfig != null && plugin != null && plugin.transmogInitialized)
 			{
 				System.out.println("in the dropdown action method");
 				plugin.loadConfiguration(selectedConfig, npcModelIDFields);
 				plugin.loadSliderConfiguration(selectedConfig, npcRadiusSlider, npcXoffsetSlider, npcYoffsetSlider);
 				plugin.onConfigChanged();
+				saveCurrentConfiguration();
 			}
 		});
 
@@ -294,14 +297,62 @@ public class NpcFollowerPanel extends PluginPanel
 
 	// Initialize config dropdown
 	private void initializeConfigDropdown() {
-		System.out.println("Panel before null check");
+//		System.out.println("Panel before null check");
 
 		if (dataManager != null)
 		{
-			System.out.println("Panel after null check");
+//			System.out.println("Panel after null check");
 			dataManager.initializeConfigDropdown(configDropdown);
 		}
 	}
+
+
+	public void saveCurrentConfiguration() {
+		String selectedConfig = enableCustomCheckbox.isSelected() ? (String) configDropdown.getSelectedItem() : (String) npcPresetDropdown.getSelectedItem();
+		boolean isCustomEnabled = enableCustomCheckbox.isSelected();
+
+		System.out.println("Saving current configuration...");
+		System.out.println("Selected config: " + selectedConfig);
+		System.out.println("Is custom enabled: " + isCustomEnabled);
+
+		configManager.setConfiguration("petToNpcTransmog", "lastSelectedConfig", selectedConfig);
+		configManager.setConfiguration("petToNpcTransmog", "isCustomEnabled", String.valueOf(isCustomEnabled));
+	}
+
+	public void loadLastConfiguration() {
+		String lastSelectedConfig = configManager.getConfiguration("petToNpcTransmog", "lastSelectedConfig");
+		boolean isCustomEnabled = Boolean.parseBoolean(configManager.getConfiguration("petToNpcTransmog", "isCustomEnabled"));
+
+		System.out.println("Loading last configuration...");
+		System.out.println("Last selected config: " + lastSelectedConfig);
+		System.out.println("Is custom enabled: " + isCustomEnabled);
+
+		enableCustomCheckbox.setSelected(isCustomEnabled);
+		if (isCustomEnabled) {
+			configDropdown.setSelectedItem(lastSelectedConfig);
+			plugin.loadConfiguration(lastSelectedConfig, npcModelIDFields);
+			plugin.loadSliderConfiguration(lastSelectedConfig, npcRadiusSlider, npcXoffsetSlider, npcYoffsetSlider);
+			toggleCustomFields(enableCustomCheckbox.isSelected());
+
+			// Debugging output for custom fields
+			for (int i = 0; i < npcModelIDFields.length; i++) {
+				System.out.println("NPC Model ID " + (i + 1) + ": " + npcModelIDFields[i].getText());
+			}
+			System.out.println("Standing Animation ID: " + npcStandingAnim.getText());
+			System.out.println("Walking Animation ID: " + npcWalkingAnim.getText());
+			System.out.println("Spawn Animation ID: " + npcSpawnAnim.getText());
+			System.out.println("Radius: " + npcRadiusSlider.getValue());
+			System.out.println("X Offset: " + npcXoffsetSlider.getValue());
+			System.out.println("Y Offset: " + npcYoffsetSlider.getValue());
+		} else {
+			npcPresetDropdown.setSelectedItem(lastSelectedConfig);
+
+			// Debugging output for preset fields
+			System.out.println("Selected preset: " + lastSelectedConfig);
+		}
+		plugin.onConfigChanged();
+	}
+
 
 
 
