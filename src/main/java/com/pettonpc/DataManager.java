@@ -28,7 +28,6 @@ public class DataManager {
 	}
 
 	public void updateConfigDropdown(JComboBox<String> configDropdown) {
-		System.out.println("DataManager updateConfigDropdown");
 
 		configDropdown.removeAllItems();
 		String savedConfigNames = configManager.getConfiguration("petToNpcTransmog", "savedConfigNames");

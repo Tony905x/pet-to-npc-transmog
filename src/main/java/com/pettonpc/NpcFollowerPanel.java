@@ -68,10 +68,6 @@ public class NpcFollowerPanel extends PluginPanel {
 		instructionsButton = new JButton("Instructions");
 		instructionsButton.setToolTipText("View instructions for using the plugin.");
 
-		// Add change listeners to update the values when the slider is moved
-		npcRadiusSlider.addChangeListener(e -> System.out.println("Radius: " + npcRadiusSlider.getValue()));
-		npcXoffsetSlider.addChangeListener(e -> System.out.println("X Offset: " + npcXoffsetSlider.getValue()));
-		npcYoffsetSlider.addChangeListener(e -> System.out.println("Y Offset: " + npcYoffsetSlider.getValue()));
 
 		// Create panels
 		JPanel titlePanel = new JPanel(new BorderLayout());
@@ -220,13 +216,11 @@ public class NpcFollowerPanel extends PluginPanel {
 
 		// Handle preset dropdown
 		npcPresetDropdown.addActionListener(e -> {
-			System.out.println("preset dropdown listener");
 			plugin.panelChange();
 			saveCurrentConfiguration();
 		});
 
 		enableCustomCheckbox.addActionListener(e -> {
-			System.out.println("custom button listener");
 			plugin.panelChange();
 			toggleCustomFields(enableCustomCheckbox.isSelected());
 			saveCurrentConfiguration();
@@ -234,7 +228,6 @@ public class NpcFollowerPanel extends PluginPanel {
 
 		// Handle saving values
 		saveButton.addActionListener(e -> {
-			System.out.println("entered saving method");
 
 			// Show input dialog to get the configuration name
 			String configName = JOptionPane.showInputDialog(null, "Enter configuration name:", "Save Configuration", JOptionPane.PLAIN_MESSAGE);
@@ -243,8 +236,6 @@ public class NpcFollowerPanel extends PluginPanel {
 				JOptionPane.showMessageDialog(null, "Please enter a name for the configuration before saving.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-
-			System.out.println("Saving fields!");
 			plugin.saveConfiguration(
 				configName,
 				npcModelIDFields[0].getText(),
@@ -264,7 +255,6 @@ public class NpcFollowerPanel extends PluginPanel {
 				String.valueOf(npcXoffsetSlider.getValue()), // Save slider value as String
 				String.valueOf(npcYoffsetSlider.getValue())  // Save slider value as String
 			);
-			System.out.println("updating the config dropdown from save button");
 			dataManager.updateConfigDropdown(configDropdown);
 
 			// Set the newly saved configuration as the selected item
@@ -283,7 +273,6 @@ public class NpcFollowerPanel extends PluginPanel {
 		deleteButton.addActionListener(e -> {
 			String selectedConfig = (String) configDropdown.getSelectedItem();
 			if (selectedConfig != null && !selectedConfig.isEmpty()) {
-				System.out.println("Deleting configuration: " + selectedConfig);
 				plugin.deleteConfiguration(selectedConfig);
 				dataManager.updateConfigDropdown(configDropdown);
 			}
@@ -293,7 +282,6 @@ public class NpcFollowerPanel extends PluginPanel {
 		configDropdown.addActionListener(e -> {
 			String selectedConfig = (String) configDropdown.getSelectedItem();
 			if (selectedConfig != null && plugin != null && plugin.transmogInitialized) {
-				System.out.println("in the dropdown action method");
 				plugin.loadConfiguration(selectedConfig, npcModelIDFields);
 				plugin.loadSliderConfiguration(selectedConfig, npcRadiusSlider, npcXoffsetSlider, npcYoffsetSlider);
 				plugin.panelChange();
@@ -326,10 +314,6 @@ public class NpcFollowerPanel extends PluginPanel {
 		String selectedConfig = enableCustomCheckbox.isSelected() ? (String) configDropdown.getSelectedItem() : (String) npcPresetDropdown.getSelectedItem();
 		boolean isCustomEnabled = enableCustomCheckbox.isSelected();
 
-		System.out.println("Saving current configuration...");
-		System.out.println("Selected config: " + selectedConfig);
-		System.out.println("Is custom enabled: " + isCustomEnabled);
-
 		configManager.setConfiguration("petToNpcTransmog", "lastSelectedConfig", selectedConfig);
 		configManager.setConfiguration("petToNpcTransmog", "isCustomEnabled", String.valueOf(isCustomEnabled));
 	}
@@ -338,9 +322,7 @@ public class NpcFollowerPanel extends PluginPanel {
 		String lastSelectedConfig = configManager.getConfiguration("petToNpcTransmog", "lastSelectedConfig");
 		boolean isCustomEnabled = Boolean.parseBoolean(configManager.getConfiguration("petToNpcTransmog", "isCustomEnabled"));
 
-		System.out.println("Loading last configuration...");
-		System.out.println("Last selected config: " + lastSelectedConfig);
-		System.out.println("Is custom enabled: " + isCustomEnabled);
+
 
 		enableCustomCheckbox.setSelected(isCustomEnabled);
 		if (isCustomEnabled) {
@@ -351,19 +333,9 @@ public class NpcFollowerPanel extends PluginPanel {
 
 			// Debugging output for custom fields
 			for (int i = 0; i < npcModelIDFields.length; i++) {
-				System.out.println("NPC Model ID " + (i + 1) + ": " + npcModelIDFields[i].getText());
 			}
-			System.out.println("Standing Animation ID: " + npcStandingAnim.getText());
-			System.out.println("Walking Animation ID: " + npcWalkingAnim.getText());
-			System.out.println("Spawn Animation ID: " + npcSpawnAnim.getText());
-			System.out.println("Radius: " + npcRadiusSlider.getValue());
-			System.out.println("X Offset: " + npcXoffsetSlider.getValue());
-			System.out.println("Y Offset: " + npcYoffsetSlider.getValue());
 		} else {
 			npcPresetDropdown.setSelectedItem(lastSelectedConfig);
-
-			// Debugging output for preset fields
-			System.out.println("Selected preset: " + lastSelectedConfig);
 		}
 		plugin.panelChange();
 	}
@@ -508,26 +480,15 @@ public class NpcFollowerPanel extends PluginPanel {
 		// Load and set the radius value
 		String radiusValue = plugin.loadConfiguration(configName, "npcRadius");
 		if (radiusValue != null) {
-			System.out.println("radius not null");
 			int radius = Integer.parseInt(radiusValue);
 			int sliderValue = (radius / 60) - 1;
 			npcRadiusSlider.setValue(sliderValue);
 		} else {
-			System.out.println("radius null");
 			npcRadiusSlider.setValue(0);
 		}
 
 		npcXoffsetSlider.setValue(Integer.parseInt(plugin.loadConfiguration(configName, "npcXoffset")));
 		npcYoffsetSlider.setValue(Integer.parseInt(plugin.loadConfiguration(configName, "npcYoffset")));
-
-		// Debugging
-		System.out.println("Loaded Configuration: " + configName);
-		System.out.println("Standing Anim: " + npcStandingAnim.getText());
-		System.out.println("Walking Anim: " + npcWalkingAnim.getText());
-		System.out.println("Spawn Anim: " + npcSpawnAnim.getText());
-		System.out.println("Radius: " + npcRadiusSlider.getValue());
-		System.out.println("X Offset: " + npcXoffsetSlider.getValue());
-		System.out.println("Y Offset: " + npcYoffsetSlider.getValue());
 	}
 
 	public void toggleCustomFields(boolean enable) {
