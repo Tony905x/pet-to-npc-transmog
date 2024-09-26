@@ -3,15 +3,9 @@ package com.pettonpc;
 import javax.swing.JComboBox;
 import net.runelite.client.config.ConfigManager;
 
+public class DataManager {
 
-
-public class DataManager
-{
-
-//	@Inject
-	//
 	private ConfigManager configManager;
-
 
 	public DataManager(ConfigManager configManager) {
 		this.configManager = configManager;
@@ -21,40 +15,11 @@ public class DataManager
 		configManager.setConfiguration("petToNpcTransmog", name + "_" + key, String.valueOf(value));
 	}
 
-	public void saveMultipleConfigurations(String name, String... npcModelIDs) {
-		for (int i = 0; i < npcModelIDs.length; i++) {
-			if (npcModelIDs[i] != null && !npcModelIDs[i].isEmpty()) {
-				saveConfiguration(name, "npcModelID" + (i + 1), Integer.parseInt(npcModelIDs[i]));
-			}
-		}
-	}
-
-	public String loadConfiguration(String name, String key) {
-		return configManager.getConfiguration("petToNpcTransmog", name + "_" + key);
-	}
-
-	public void deleteConfiguration(String name) {
-		for (int i = 1; i <= 10; i++) {
-			configManager.unsetConfiguration("petToNpcTransmog", name + "_npcModelID" + i);
-		}
-		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcStandingAnim");
-		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcWalkingAnim");
-		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcSpawnAnim");
-		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcRadius");
-		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcXoffset");
-		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcYoffset");
-	}
-
-	public String getSavedConfigNames()
-	{
-//		if (panel == null) {
-//			return "";
-//		}
+	public String getSavedConfigNames() {
 		return configManager.getConfiguration("petToNpcTransmog", "savedConfigNames");
 	}
 
-	public void setSavedConfigNames(String savedConfigNames)
-	{
+	public void setSavedConfigNames(String savedConfigNames) {
 		configManager.setConfiguration("petToNpcTransmog", "savedConfigNames", savedConfigNames);
 	}
 
@@ -74,4 +39,6 @@ public class DataManager
 			}
 		}
 	}
+
+
 }

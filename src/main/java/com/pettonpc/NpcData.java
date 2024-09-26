@@ -16,7 +16,8 @@ public enum NpcData
 //	Zilyana("Zilyana", Lists.newArrayList(27989, 27937, 27985, 27968, 27990), 6966, 6965, 120, 6967),
 	Kklik("Kklik", Lists.newArrayList(13850,13848,13849), 3345, 3346, 60, 3345,0,0),
 	Seren("Seren", Lists.newArrayList(38605), 8372, 8372, 180, 8380,0,0),
-	Nightmare("Nightmare", Lists.newArrayList(42591), 8593, 8634, 300, 8609,2,0);
+	Nightmare("Nightmare", Lists.newArrayList(42591), 8593, 8634, 300, 8609,2,0),
+	Dog("Good Boy", Lists.newArrayList(26253), 6561, 6560, 60, 6561,0,0);
 //	Whisperer("Nightmare", Lists.newArrayList(49222,49218,49221,49224,49219), 10230, 10232, 300, 8609, 2);
 
 
