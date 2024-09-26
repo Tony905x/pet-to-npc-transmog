@@ -35,7 +35,8 @@ import javax.swing.JTextField;
 	description = "Customize your pets appearance to be any NPC/Object",
 	tags = {"pet", "npc", "transmog", "companion", "follower"}
 )
-public class NpcFollowerPlugin extends Plugin {
+public class NpcFollowerPlugin extends Plugin
+{
 	@Inject
 	private Client client;
 	@Inject
@@ -73,7 +74,8 @@ public class NpcFollowerPlugin extends Plugin {
 //	}
 
 	@Override
-	protected void startUp() {
+	protected void startUp()
+	{
 		initializeVariables();
 		dataManager = new DataManager(configManager);
 		panel = new NpcFollowerPanel(this, configManager, dataManager);
@@ -90,13 +92,15 @@ public class NpcFollowerPlugin extends Plugin {
 
 		clientToolbar.addNavigation(navButton);
 
-		if (panel != null) {
+		if (panel != null)
+		{
 			panel.loadLastConfiguration();
 		}
 	}
 
 	@Override
-	protected void shutDown() throws InterruptedException {
+	protected void shutDown() throws InterruptedException
+	{
 		final CountDownLatch latch = new CountDownLatch(1);
 
 		clientThread.invokeLater(() -> {
@@ -115,41 +119,52 @@ public class NpcFollowerPlugin extends Plugin {
 		clientToolbar.removeNavigation(navButton);
 	}
 
-	private void initializeVariables() {
+	private void initializeVariables()
+	{
 		transmogInitialized = false;
 		transmogObjects = new ArrayList<>();
 	}
 
 	@Subscribe
-	public void onClientTick(ClientTick event) {
+	public void onClientTick(ClientTick event)
+	{
 		NPC follower = client.getFollower();
 
-		if (follower != null) {
-			if (transmogObjects == null) {
+		if (follower != null)
+		{
+			if (transmogObjects == null)
+			{
 				transmogObjects = new ArrayList<>();
-				if (playerStateTracker != null) {
+				if (playerStateTracker != null)
+				{
 					playerStateTracker.setTransmogObjects(transmogObjects);
 				}
-				if (animationManager != null) {
+				if (animationManager != null)
+				{
 					animationManager.setTransmogObjects(transmogObjects);
 				}
 			}
-			if (!transmogInitialized) {
+			if (!transmogInitialized)
+			{
 				RuneLiteObject transmogObject = initializeTransmogObject(follower);
-				if (transmogObject != null) {
+				if (transmogObject != null)
+				{
 					transmogInitialized = true;
 				}
 			}
 			updateTransmogObject(follower);
-			if (playerStateTracker != null) {
+			if (playerStateTracker != null)
+			{
 				playerStateTracker.updateFollowerMovement(follower);
 			}
 		}
 	}
 
-	private RuneLiteObject initializeTransmogObject(NPC follower) {
+	private RuneLiteObject initializeTransmogObject(NPC follower)
+	{
 		transmogObjects.clear();
-		for (RuneLiteObject transmogObject : transmogObjects) {
+		for (RuneLiteObject transmogObject : transmogObjects)
+		{
 			transmogObject.setActive(false);
 			transmogObject.setFinished(true);
 		}
@@ -160,9 +175,11 @@ public class NpcFollowerPlugin extends Plugin {
 		RuneLiteObject transmogObject = client.createRuneLiteObject();
 		NpcData selectedNpc = panel.getSelectedNpc();
 
-		if (transmogObject != null) {
+		if (transmogObject != null)
+		{
 			Model mergedModel = createNpcModel(selectedNpc);
-			if (mergedModel != null) {
+			if (mergedModel != null)
+			{
 				transmogObject.setModel(mergedModel);
 				transmogObjects.add(transmogObject);
 				transmogObject.setActive(true);
@@ -178,22 +195,28 @@ public class NpcFollowerPlugin extends Plugin {
 		return transmogObject;
 	}
 
-	public void panelChange() {
-		if (panel == null) {
+	public void panelChange()
+	{
+		if (panel == null)
+		{
 			return;
 		}
 
 		NpcData selectedNpc = panel.getSelectedNpc();
-		if (panel.enableCustom()) {
+		if (panel.enableCustom())
+		{
 			String configName = (String) panel.getConfigDropdown().getSelectedItem();
 			panel.updateFieldsWithDropdownData(configName);
-		} else {
+		}
+		else
+		{
 			panel.updateFieldsWithNpcData(selectedNpc);
 		}
 
 		clientThread.invokeLater(() -> {
 			Model mergedModel = createNpcModel(selectedNpc);
-			if (mergedModel != null && !transmogObjects.isEmpty()) {
+			if (mergedModel != null && !transmogObjects.isEmpty())
+			{
 				RuneLiteObject transmogObject = transmogObjects.get(0);
 				transmogObject.setModel(mergedModel);
 				transmogObject.setActive(true);
@@ -206,7 +229,8 @@ public class NpcFollowerPlugin extends Plugin {
 		});
 	}
 
-	private void updateTransmogObject(NPC follower) {
+	private void updateTransmogObject(NPC follower)
+	{
 		WorldView worldView = client.getTopLevelWorldView();
 		LocalPoint followerLocation = follower.getLocalLocation();
 		Player player = client.getLocalPlayer();
@@ -216,10 +240,13 @@ public class NpcFollowerPlugin extends Plugin {
 		int angle;
 		int radius;
 
-		if (panel.enableCustom()) {
+		if (panel.enableCustom())
+		{
 			offsetX = panel.getOffsetX() * TILE_TO_LOCAL_UNIT;
 			offsetY = panel.getOffsetY() * TILE_TO_LOCAL_UNIT;
-		} else {
+		}
+		else
+		{
 			offsetX = panel.getSelectedNpc().getOffsetX() * TILE_TO_LOCAL_UNIT;
 			offsetY = panel.getSelectedNpc().getOffsetY() * TILE_TO_LOCAL_UNIT;
 		}
@@ -230,23 +257,32 @@ public class NpcFollowerPlugin extends Plugin {
 		int dy = player.getLocalLocation().getY() - newY;
 		LocalPoint newLocation = new LocalPoint(newX, newY);
 
-		if (offsetX == 0 && offsetY == 0) {
+		if (offsetX == 0 && offsetY == 0)
+		{
 			angle = follower.getCurrentOrientation();
-		} else {
+		}
+		else
+		{
 			angle = (int) ((Math.atan2(-dy, dx) * ANGLE_CONSTANT) / (2 * Math.PI) + ANGLE_OFFSET) % ANGLE_CONSTANT;
 		}
 
 		Angle followerOrientation = new Angle(angle);
 
-		if (transmogObjects != null) {
-			for (RuneLiteObject transmogObject : transmogObjects) {
-				if (transmogObject != null) {
+		if (transmogObjects != null)
+		{
+			for (RuneLiteObject transmogObject : transmogObjects)
+			{
+				if (transmogObject != null)
+				{
 					transmogObject.setLocation(newLocation, worldView.getPlane());
 					transmogObject.setOrientation(followerOrientation.getAngle());
 
-					if (panel.enableCustom()) {
+					if (panel.enableCustom())
+					{
 						radius = panel.getModelRadius();
-					} else {
+					}
+					else
+					{
 						radius = panel.getSelectedNpc().getRadius();
 					}
 					transmogObject.setRadius(radius);
@@ -259,56 +295,69 @@ public class NpcFollowerPlugin extends Plugin {
 	}
 
 
-	public Model createNpcModel(NpcData selectedNpc) {
+	public Model createNpcModel(NpcData selectedNpc)
+	{
 		List<Integer> modelIds = new ArrayList<>();
 
-		if (panel.enableCustom()) {
+		if (panel.enableCustom())
+		{
 			int[] npcModelIDs = {
 				panel.getNpcModelID1(), panel.getNpcModelID2(), panel.getNpcModelID3(), panel.getNpcModelID4(),
 				panel.getNpcModelID5(), panel.getNpcModelID6(), panel.getNpcModelID7(), panel.getNpcModelID8(),
 				panel.getNpcModelID9(), panel.getNpcModelID10()
 			};
 
-			for (int modelId : npcModelIDs) {
-				if (modelId > 0) {
+			for (int modelId : npcModelIDs)
+			{
+				if (modelId > 0)
+				{
 					modelIds.add(modelId);
 				}
 			}
-		} else {
+		}
+		else
+		{
 			modelIds.addAll(selectedNpc.getModelIDs());
 		}
 
-		if (modelIds.isEmpty()) {
+		if (modelIds.isEmpty())
+		{
 			return null;
 		}
 
 		ModelData[] modelDataArray = modelIds.stream().map(client::loadModelData).toArray(ModelData[]::new);
 
-		if (Arrays.stream(modelDataArray).anyMatch(Objects::isNull)) {
+		if (Arrays.stream(modelDataArray).anyMatch(Objects::isNull))
+		{
 			return null;
 		}
 
 		ModelData mergedModelData = client.mergeModels(modelDataArray);
-		if (mergedModelData == null) {
+		if (mergedModelData == null)
+		{
 			return null;
 		}
 
 		return mergedModelData.light();
 	}
 
-	public Model createCustomNpcModel(List<Integer> modelIds, int standingAnim, int walkingAnim, int spawnAnim) {
-		if (modelIds.isEmpty()) {
+	public Model createCustomNpcModel(List<Integer> modelIds, int standingAnim, int walkingAnim, int spawnAnim)
+	{
+		if (modelIds.isEmpty())
+		{
 			return null;
 		}
 
 		ModelData[] modelDataArray = modelIds.stream().map(client::loadModelData).toArray(ModelData[]::new);
 
-		if (Arrays.stream(modelDataArray).anyMatch(Objects::isNull)) {
+		if (Arrays.stream(modelDataArray).anyMatch(Objects::isNull))
+		{
 			return null;
 		}
 
 		ModelData mergedModelData = client.mergeModels(modelDataArray);
-		if (mergedModelData == null) {
+		if (mergedModelData == null)
+		{
 			return null;
 		}
 
@@ -321,34 +370,44 @@ public class NpcFollowerPlugin extends Plugin {
 	}
 
 
-	public void setTransmogObjects(List<RuneLiteObject> transmogObjects) {
+	public void setTransmogObjects(List<RuneLiteObject> transmogObjects)
+	{
 		this.transmogObjects = transmogObjects;
 	}
 
-	boolean shouldDraw(Renderable renderable, boolean drawingUI) {
-		if (renderable instanceof NPC) {
+	boolean shouldDraw(Renderable renderable, boolean drawingUI)
+	{
+		if (renderable instanceof NPC)
+		{
 			NPC npc = (NPC) renderable;
-			if (npc == client.getFollower()) {
+			if (npc == client.getFollower())
+			{
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public void loadConfiguration(String name, JTextField... npcModelIDFields) {
-		for (int i = 0; i < npcModelIDFields.length; i++) {
+	public void loadConfiguration(String name, JTextField... npcModelIDFields)
+	{
+		for (int i = 0; i < npcModelIDFields.length; i++)
+		{
 			String npcModelID = loadConfiguration(name, "npcModelID" + (i + 1));
 			npcModelIDFields[i].setText(npcModelID);
 		}
 	}
 
-	public String loadConfiguration(String name, String key) {
+	public String loadConfiguration(String name, String key)
+	{
 		return configManager.getConfiguration("petToNpcTransmog", name + "_" + key);
 	}
 
-	public void saveConfiguration(String name, String... npcModelIDs) {
-		for (int i = 0; i < npcModelIDs.length; i++) {
-			if (npcModelIDs[i] != null && !npcModelIDs[i].isEmpty()) {
+	public void saveConfiguration(String name, String... npcModelIDs)
+	{
+		for (int i = 0; i < npcModelIDs.length; i++)
+		{
+			if (npcModelIDs[i] != null && !npcModelIDs[i].isEmpty())
+			{
 				saveConfiguration(name, "npcModelID" + (i + 1), Integer.parseInt(npcModelIDs[i]));
 			}
 		}
@@ -363,40 +422,54 @@ public class NpcFollowerPlugin extends Plugin {
 		updateSavedConfigNames(name);
 	}
 
-	public void saveConfiguration(String name, String key, int value) {
+	public void saveConfiguration(String name, String key, int value)
+	{
 		configManager.setConfiguration("petToNpcTransmog", name + "_" + key, String.valueOf(value));
 	}
 
-	public void loadSliderConfiguration(String name, JSlider... sliders) {
-		for (JSlider slider : sliders) {
+	public void loadSliderConfiguration(String name, JSlider... sliders)
+	{
+		for (JSlider slider : sliders)
+		{
 			String value = loadConfiguration(name, slider.getName());
-			if (value != null) {
+			if (value != null)
+			{
 				slider.setValue(Integer.parseInt(value));
-			} else {
+			}
+			else
+			{
 				slider.setValue(0);
 			}
 		}
 	}
 
-	private void updateSavedConfigNames(String newConfigName) {
+	private void updateSavedConfigNames(String newConfigName)
+	{
 		String savedConfigNames = dataManager.getSavedConfigNames();
 
-		if (savedConfigNames == null) {
+		if (savedConfigNames == null)
+		{
 			savedConfigNames = "";
 		}
 
-		if (!savedConfigNames.contains(newConfigName)) {
-			if (savedConfigNames.isEmpty()) {
+		if (!savedConfigNames.contains(newConfigName))
+		{
+			if (savedConfigNames.isEmpty())
+			{
 				savedConfigNames = newConfigName;
-			} else {
+			}
+			else
+			{
 				savedConfigNames = savedConfigNames + "," + newConfigName;
 			}
 			dataManager.setSavedConfigNames(savedConfigNames);
 		}
 	}
 
-	public void deleteConfiguration(String name) {
-		for (int i = 1; i <= 10; i++) {
+	public void deleteConfiguration(String name)
+	{
+		for (int i = 1; i <= 10; i++)
+		{
 			configManager.unsetConfiguration("petToNpcTransmog", name + "_npcModelID" + i);
 		}
 		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcStandingAnim");
@@ -407,12 +480,16 @@ public class NpcFollowerPlugin extends Plugin {
 		configManager.unsetConfiguration("petToNpcTransmog", name + "_npcYoffset");
 
 		String savedConfigNames = dataManager.getSavedConfigNames();
-		if (savedConfigNames != null && !savedConfigNames.isEmpty()) {
+		if (savedConfigNames != null && !savedConfigNames.isEmpty())
+		{
 			String[] configNames = savedConfigNames.split(",");
 			StringBuilder updatedConfigNames = new StringBuilder();
-			for (String configName : configNames) {
-				if (!configName.equals(name)) {
-					if (updatedConfigNames.length() > 0) {
+			for (String configName : configNames)
+			{
+				if (!configName.equals(name))
+				{
+					if (updatedConfigNames.length() > 0)
+					{
 						updatedConfigNames.append(",");
 					}
 					updatedConfigNames.append(configName);

@@ -6,7 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import net.runelite.client.config.ConfigManager;
 
-public class NpcFollowerPanel extends PluginPanel {
+public class NpcFollowerPanel extends PluginPanel
+{
 	private final NpcFollowerPlugin plugin;
 	private final ConfigManager configManager;
 	private final DataManager dataManager;
@@ -30,7 +31,8 @@ public class NpcFollowerPanel extends PluginPanel {
 	private static final int DEFAULT_WALKING_ANIM = 0;
 	private static final int DEFAULT_SPAWN_ANIM = 0;
 
-	public NpcFollowerPanel(NpcFollowerPlugin plugin, ConfigManager configManager, DataManager dataManager) {
+	public NpcFollowerPanel(NpcFollowerPlugin plugin, ConfigManager configManager, DataManager dataManager)
+	{
 		this.plugin = plugin;
 		this.configManager = configManager;
 		this.dataManager = dataManager;
@@ -45,7 +47,8 @@ public class NpcFollowerPanel extends PluginPanel {
 		configDropdown = new JComboBox<>();
 		configDropdown.setToolTipText("Select a saved custom configuration.");
 		npcModelIDFields = new JTextField[10];
-		for (int i = 0; i < npcModelIDFields.length; i++) {
+		for (int i = 0; i < npcModelIDFields.length; i++)
+		{
 			npcModelIDFields[i] = new JTextField();
 			npcModelIDFields[i].setToolTipText("Enter the model ID's for NPC. If only one Model ID is needed then the remaining ID fields can be left blank.");
 		}
@@ -124,7 +127,8 @@ public class NpcFollowerPanel extends PluginPanel {
 		mainPanel.add(npcModelIDFields[0], gbc);
 
 		// Constraints for NPC Model ID fields 2 to 10
-		for (int i = 1; i < npcModelIDFields.length; i++) {
+		for (int i = 1; i < npcModelIDFields.length; i++)
+		{
 			gbc.insets = new Insets(5, 0, 5, 20); // Set left inset to 10 for fields 2 to 10
 			gbc.gridx = 0;
 			gbc.gridy++;
@@ -232,7 +236,8 @@ public class NpcFollowerPanel extends PluginPanel {
 			// Show input dialog to get the configuration name
 			String configName = JOptionPane.showInputDialog(null, "Enter configuration name:", "Save Configuration", JOptionPane.PLAIN_MESSAGE);
 
-			if (configName == null || configName.isEmpty()) {
+			if (configName == null || configName.isEmpty())
+			{
 				JOptionPane.showMessageDialog(null, "Please enter a name for the configuration before saving.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
@@ -272,7 +277,8 @@ public class NpcFollowerPanel extends PluginPanel {
 		// Handle deleting values
 		deleteButton.addActionListener(e -> {
 			String selectedConfig = (String) configDropdown.getSelectedItem();
-			if (selectedConfig != null && !selectedConfig.isEmpty()) {
+			if (selectedConfig != null && !selectedConfig.isEmpty())
+			{
 				plugin.deleteConfiguration(selectedConfig);
 				dataManager.updateConfigDropdown(configDropdown);
 			}
@@ -281,7 +287,8 @@ public class NpcFollowerPanel extends PluginPanel {
 		// Add ActionListener to configDropdown
 		configDropdown.addActionListener(e -> {
 			String selectedConfig = (String) configDropdown.getSelectedItem();
-			if (selectedConfig != null && plugin != null && plugin.transmogInitialized) {
+			if (selectedConfig != null && plugin != null && plugin.transmogInitialized)
+			{
 				plugin.loadConfiguration(selectedConfig, npcModelIDFields);
 				plugin.loadSliderConfiguration(selectedConfig, npcRadiusSlider, npcXoffsetSlider, npcYoffsetSlider);
 				plugin.panelChange();
@@ -296,7 +303,8 @@ public class NpcFollowerPanel extends PluginPanel {
 		toggleCustomFields(enableCustomCheckbox.isSelected());
 	}
 
-	private void addLabelAndField(JPanel panel, String labelText, JComponent field) {
+	private void addLabelAndField(JPanel panel, String labelText, JComponent field)
+	{
 		JLabel label = new JLabel(labelText);
 		label.setFont(new Font("Arial", Font.PLAIN, 12));
 		panel.add(label);
@@ -304,13 +312,16 @@ public class NpcFollowerPanel extends PluginPanel {
 	}
 
 	// Initialize config dropdown
-	private void initializeConfigDropdown() {
-		if (dataManager != null) {
+	private void initializeConfigDropdown()
+	{
+		if (dataManager != null)
+		{
 			dataManager.initializeConfigDropdown(configDropdown);
 		}
 	}
 
-	public void saveCurrentConfiguration() {
+	public void saveCurrentConfiguration()
+	{
 		String selectedConfig = enableCustomCheckbox.isSelected() ? (String) configDropdown.getSelectedItem() : (String) npcPresetDropdown.getSelectedItem();
 		boolean isCustomEnabled = enableCustomCheckbox.isSelected();
 
@@ -318,126 +329,156 @@ public class NpcFollowerPanel extends PluginPanel {
 		configManager.setConfiguration("petToNpcTransmog", "isCustomEnabled", String.valueOf(isCustomEnabled));
 	}
 
-	public void loadLastConfiguration() {
+	public void loadLastConfiguration()
+	{
 		String lastSelectedConfig = configManager.getConfiguration("petToNpcTransmog", "lastSelectedConfig");
 		boolean isCustomEnabled = Boolean.parseBoolean(configManager.getConfiguration("petToNpcTransmog", "isCustomEnabled"));
 
 
-
 		enableCustomCheckbox.setSelected(isCustomEnabled);
-		if (isCustomEnabled) {
+		if (isCustomEnabled)
+		{
 			configDropdown.setSelectedItem(lastSelectedConfig);
 			plugin.loadConfiguration(lastSelectedConfig, npcModelIDFields);
 			plugin.loadSliderConfiguration(lastSelectedConfig, npcRadiusSlider, npcXoffsetSlider, npcYoffsetSlider);
 			toggleCustomFields(enableCustomCheckbox.isSelected());
 
 			// Debugging output for custom fields
-			for (int i = 0; i < npcModelIDFields.length; i++) {
+			for (int i = 0; i < npcModelIDFields.length; i++)
+			{
 			}
-		} else {
+		}
+		else
+		{
 			npcPresetDropdown.setSelectedItem(lastSelectedConfig);
 		}
 		plugin.panelChange();
 	}
 
-	private void populateNpcPresetDropdown() {
-		for (NpcData npcData : NpcData.values()) {
+	private void populateNpcPresetDropdown()
+	{
+		for (NpcData npcData : NpcData.values())
+		{
 			npcPresetDropdown.addItem(npcData.getName());
 		}
 	}
 
-	public NpcData getSelectedNpc() {
+	public NpcData getSelectedNpc()
+	{
 		String selectedNpcName = (String) npcPresetDropdown.getSelectedItem();
-		for (NpcData npcData : NpcData.values()) {
-			if (npcData.getName().equals(selectedNpcName)) {
+		for (NpcData npcData : NpcData.values())
+		{
+			if (npcData.getName().equals(selectedNpcName))
+			{
 				return npcData;
 			}
 		}
 		return null; // or a default value
 	}
 
-	public boolean enableCustom() {
+	public boolean enableCustom()
+	{
 		return enableCustomCheckbox.isSelected();
 	}
 
-	public int getModelRadius() {
+	public int getModelRadius()
+	{
 		// Each slider step represents an increment of 60
 		return (npcRadiusSlider.getValue() + 1) * 60;
 	}
 
-	public int getOffsetX() {
+	public int getOffsetX()
+	{
 		return npcXoffsetSlider.getValue();
 	}
 
-	public int getOffsetY() {
+	public int getOffsetY()
+	{
 		return npcYoffsetSlider.getValue();
 	}
 
-	public int getNpcModelID1() {
+	public int getNpcModelID1()
+	{
 		return parseIntegerField(npcModelIDFields[0], DEFAULT_MODEL_ID);
 	}
 
-	public int getNpcModelID2() {
+	public int getNpcModelID2()
+	{
 		return parseIntegerField(npcModelIDFields[1], DEFAULT_MODEL_ID);
 	}
 
-	public int getNpcModelID3() {
+	public int getNpcModelID3()
+	{
 		return parseIntegerField(npcModelIDFields[2], DEFAULT_MODEL_ID);
 	}
 
-	public int getNpcModelID4() {
+	public int getNpcModelID4()
+	{
 		return parseIntegerField(npcModelIDFields[3], DEFAULT_MODEL_ID);
 	}
 
-	public int getNpcModelID5() {
+	public int getNpcModelID5()
+	{
 		return parseIntegerField(npcModelIDFields[4], DEFAULT_MODEL_ID);
 	}
 
-	public int getNpcModelID6() {
+	public int getNpcModelID6()
+	{
 		return parseIntegerField(npcModelIDFields[5], DEFAULT_MODEL_ID);
 	}
 
-	public int getNpcModelID7() {
+	public int getNpcModelID7()
+	{
 		return parseIntegerField(npcModelIDFields[6], DEFAULT_MODEL_ID);
 	}
 
-	public int getNpcModelID8() {
+	public int getNpcModelID8()
+	{
 		return parseIntegerField(npcModelIDFields[7], DEFAULT_MODEL_ID);
 	}
 
-	public int getNpcModelID9() {
+	public int getNpcModelID9()
+	{
 		return parseIntegerField(npcModelIDFields[8], DEFAULT_MODEL_ID);
 	}
 
-	public int getNpcModelID10() {
+	public int getNpcModelID10()
+	{
 		return parseIntegerField(npcModelIDFields[9], DEFAULT_MODEL_ID);
 	}
 
-	public int getStandingAnimationId() {
+	public int getStandingAnimationId()
+	{
 		return parseIntegerField(npcStandingAnim, DEFAULT_STANDING_ANIM);
 	}
 
-	public int getWalkingAnimationId() {
+	public int getWalkingAnimationId()
+	{
 		return parseIntegerField(npcWalkingAnim, DEFAULT_WALKING_ANIM);
 	}
 
-	public int getSpawnAnimationID() {
+	public int getSpawnAnimationID()
+	{
 		return parseIntegerField(npcSpawnAnim, DEFAULT_SPAWN_ANIM);
 	}
 
-	private int parseIntegerField(JTextField field, int defaultValue) {
+	private int parseIntegerField(JTextField field, int defaultValue)
+	{
 		String text = field.getText();
-		if (text == null || text.isEmpty()) {
+		if (text == null || text.isEmpty())
+		{
 			return defaultValue;
 		}
 		return Integer.parseInt(text);
 	}
 
-	public JComboBox<String> getConfigDropdown() {
+	public JComboBox<String> getConfigDropdown()
+	{
 		return configDropdown;
 	}
 
-	public void updateFieldsWithNpcData(NpcData npcData) {
+	public void updateFieldsWithNpcData(NpcData npcData)
+	{
 		npcModelIDFields[0].setText(String.valueOf(npcData.getModelIDs().get(0)));
 		npcModelIDFields[1].setText(npcData.getModelIDs().size() > 1 ? String.valueOf(npcData.getModelIDs().get(1)) : "");
 		npcModelIDFields[2].setText(npcData.getModelIDs().size() > 2 ? String.valueOf(npcData.getModelIDs().get(2)) : "");
@@ -462,7 +503,8 @@ public class NpcFollowerPanel extends PluginPanel {
 	}
 
 
-	public void updateFieldsWithDropdownData(String configName) {
+	public void updateFieldsWithDropdownData(String configName)
+	{
 		npcModelIDFields[0].setText(plugin.loadConfiguration(configName, "npcModelID1"));
 		npcModelIDFields[1].setText(plugin.loadConfiguration(configName, "npcModelID2"));
 		npcModelIDFields[2].setText(plugin.loadConfiguration(configName, "npcModelID3"));
@@ -479,11 +521,14 @@ public class NpcFollowerPanel extends PluginPanel {
 
 		// Load and set the radius value
 		String radiusValue = plugin.loadConfiguration(configName, "npcRadius");
-		if (radiusValue != null) {
+		if (radiusValue != null)
+		{
 			int radius = Integer.parseInt(radiusValue);
 			int sliderValue = (radius / 60) - 1;
 			npcRadiusSlider.setValue(sliderValue);
-		} else {
+		}
+		else
+		{
 			npcRadiusSlider.setValue(0);
 		}
 
@@ -491,10 +536,12 @@ public class NpcFollowerPanel extends PluginPanel {
 		npcYoffsetSlider.setValue(Integer.parseInt(plugin.loadConfiguration(configName, "npcYoffset")));
 	}
 
-	public void toggleCustomFields(boolean enable) {
+	public void toggleCustomFields(boolean enable)
+	{
 		npcPresetDropdown.setEnabled(!enable);
 		configDropdown.setEnabled(enable);
-		for (JTextField field : npcModelIDFields) {
+		for (JTextField field : npcModelIDFields)
+		{
 			field.setEnabled(enable);
 		}
 		npcStandingAnim.setEnabled(enable);
@@ -507,7 +554,8 @@ public class NpcFollowerPanel extends PluginPanel {
 		deleteButton.setEnabled(enable);
 	}
 
-	private void showInstructionsDialog() {
+	private void showInstructionsDialog()
+	{
 		String instructionsText = "<html>" +
 			"<style>" +
 			"ul { padding-left: 0; margin-left: 0; list-style-position: inside; }" +
