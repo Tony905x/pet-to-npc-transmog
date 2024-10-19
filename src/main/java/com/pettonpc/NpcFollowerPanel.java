@@ -29,7 +29,7 @@ public class NpcFollowerPanel extends PluginPanel
 	private static final int DEFAULT_OFFSET = 0;
 	private static final int DEFAULT_STANDING_ANIM = -1;
 	private static final int DEFAULT_WALKING_ANIM = -1;
-	private static final int DEFAULT_SPAWN_ANIM = -1;
+	private static final int DEFAULT_SPAWN_ANIM = 4;
 
 	public NpcFollowerPanel(NpcFollowerPlugin plugin, ConfigManager configManager, DataManager dataManager)
 	{
@@ -59,7 +59,7 @@ public class NpcFollowerPanel extends PluginPanel
 		npcSpawnAnim = new JTextField();
 		npcSpawnAnim.setToolTipText("Enter the spawn animation ID for the NPC.");
 		npcRadiusSlider = new JSlider(0, 5, 0);
-		npcRadiusSlider.setToolTipText("Adjust the radius of the NPC.  Doesn't increase size, it prevents clipping for large NPC's");
+		npcRadiusSlider.setToolTipText("Adjust the radius of the NPC. Doesn't increase size, it prevents clipping for large NPCs.");
 		npcXoffsetSlider = new JSlider(0, 5, 0);
 		npcXoffsetSlider.setToolTipText("Adjust the X offset of the NPC.");
 		npcYoffsetSlider = new JSlider(0, 5, 0);
@@ -70,7 +70,6 @@ public class NpcFollowerPanel extends PluginPanel
 		deleteButton.setToolTipText("Delete the selected configuration.");
 		instructionsButton = new JButton("Instructions");
 		instructionsButton.setToolTipText("View instructions for using the plugin.");
-
 
 		// Create panels
 		JPanel titlePanel = new JPanel(new BorderLayout());
@@ -116,20 +115,10 @@ public class NpcFollowerPanel extends PluginPanel
 		gbc.weightx = 0.5;
 		mainPanel.add(configDropdown, gbc);
 
-// Constraints for NPC Model ID 1
-//		gbc.insets = new Insets(5, 0, 5, 0);
-//		gbc.gridx = 0;
-//		gbc.gridy++;
-//		gbc.weightx = 0.5;
-//		mainPanel.add(new JLabel("NPC Model ID 1:"), gbc);
-//		gbc.gridx = 1;
-//		gbc.weightx = 0.5;
-//		mainPanel.add(npcModelIDFields[0], gbc);
-
-		// Constraints for NPC Model ID fields 2 to 10
+		// Model ID fields
 		for (int i = 0; i < npcModelIDFields.length; i++)
 		{
-			gbc.insets = new Insets(5, 0, 5, 20); // Set left inset to 10 for fields 2 to 10
+			gbc.insets = new Insets(5, 0, 5, 20);
 			gbc.gridx = 0;
 			gbc.gridy++;
 			gbc.weightx = 0.5;
@@ -139,8 +128,8 @@ public class NpcFollowerPanel extends PluginPanel
 			mainPanel.add(npcModelIDFields[i], gbc);
 		}
 
-		// Constraints for Standing Animation ID
-		gbc.insets = new Insets(20, 0, 5, 0); // Set left inset to 10 for fields 2 to 10
+		// Standing Animation
+		gbc.insets = new Insets(20, 0, 5, 0);
 		gbc.gridx = 0;
 		gbc.gridy++;
 		gbc.weightx = 0.5;
@@ -149,7 +138,7 @@ public class NpcFollowerPanel extends PluginPanel
 		gbc.weightx = 0.5;
 		mainPanel.add(npcStandingAnim, gbc);
 
-		// Constraints for Walking Animation ID
+		// Walking Animation
 		gbc.insets = new Insets(5, 0, 30, 0);
 		gbc.gridx = 0;
 		gbc.gridy++;
@@ -159,7 +148,7 @@ public class NpcFollowerPanel extends PluginPanel
 		gbc.weightx = 0.5;
 		mainPanel.add(npcWalkingAnim, gbc);
 
-		// Add "Optional" label above the Animation ID field
+		// "Optional"
 		JLabel optionalLabel = new JLabel("<html><font color='orange'><u>Optional Changes</u></font></html>");
 		optionalLabel.setFont(new Font("Serif", Font.BOLD, 11));
 
@@ -169,7 +158,7 @@ public class NpcFollowerPanel extends PluginPanel
 		gbc.weightx = 0.5;
 		mainPanel.add(optionalLabel, gbc);
 
-		// Constraints for Spawn Animation ID
+		// Spawn Animation
 		gbc.insets = new Insets(5, 0, 5, 0);
 		gbc.gridx = 0;
 		gbc.gridy++;
@@ -179,7 +168,7 @@ public class NpcFollowerPanel extends PluginPanel
 		gbc.weightx = 0.5;
 		mainPanel.add(npcSpawnAnim, gbc);
 
-		// Constraints for NPC Radius
+		// Radius
 		gbc.gridx = 0;
 		gbc.gridy++;
 		gbc.weightx = 0.5;
@@ -188,7 +177,7 @@ public class NpcFollowerPanel extends PluginPanel
 		gbc.weightx = 0.5;
 		mainPanel.add(npcRadiusSlider, gbc);
 
-		// Constraints for X Offset
+		// X Offset
 		gbc.gridx = 0;
 		gbc.gridy++;
 		gbc.weightx = 0.5;
@@ -197,7 +186,7 @@ public class NpcFollowerPanel extends PluginPanel
 		gbc.weightx = 0.5;
 		mainPanel.add(npcXoffsetSlider, gbc);
 
-		// Constraints for Y Offset
+		// Y Offset
 		gbc.gridx = 0;
 		gbc.gridy++;
 		gbc.weightx = 0.5;
@@ -218,78 +207,65 @@ public class NpcFollowerPanel extends PluginPanel
 		// Populate the NPC preset dropdown
 		populateNpcPresetDropdown();
 
-		// Handle preset dropdown
+		// preset dropdown listener
 		npcPresetDropdown.addActionListener(e -> {
 			plugin.panelChange();
 			saveCurrentConfiguration();
 		});
 
 		enableCustomCheckbox.addActionListener(e -> {
-			System.out.println("enableCustomCheckbox.addActionListener(e -> {");
-
-			// Check if there are any saved configurations
 			if (dataManager.getSavedConfigNames() == null || dataManager.getSavedConfigNames().isEmpty())
 			{
-				System.out.println("No saved configurations, setting fields to default values");
-
-				// Toggle the custom fields based on the checkbox state
 				toggleCustomFields(enableCustomCheckbox.isSelected());
-
-				// Save the current configuration as default for the future
 				plugin.panelChange();
-
-				// If no saved configurations, set the fields to their default values
 				setFieldsToDefaults();
-
 				saveCurrentConfiguration();
-//				return;
 			}
-			else {
-
-				// If there are saved configurations, proceed normally
+			else
+			{
 				plugin.panelChange();
 				toggleCustomFields(enableCustomCheckbox.isSelected());
 				saveCurrentConfiguration();
 			}
 		});
 
-
+		// Save Listener
 		saveButton.addActionListener(e -> {
-
-			// Show input dialog to get the configuration name
 			String configName = JOptionPane.showInputDialog(null, "Enter configuration name:", "Save Configuration", JOptionPane.PLAIN_MESSAGE);
-
-			if (configName == null || configName.isEmpty()) {
+			if (configName == null || configName.isEmpty())
+			{
 				JOptionPane.showMessageDialog(null, "Please enter a name for the configuration before saving.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
-			// Validate that all NPC Model ID fields contain valid integers
-			try {
-				for (JTextField modelIdField : npcModelIDFields) {
-					if (!modelIdField.getText().isEmpty()) {
-						Integer.parseInt(modelIdField.getText()); // Try parsing each field to ensure it's a valid integer
+			try
+			{
+				for (JTextField modelIdField : npcModelIDFields)
+				{
+					if (!modelIdField.getText().isEmpty())
+					{
+						Integer.parseInt(modelIdField.getText());
 					}
 				}
-
-				// Validate the animation fields (Standing, Walking, Spawn)
-				if (!npcStandingAnim.getText().isEmpty()) {
+				if (!npcStandingAnim.getText().isEmpty())
+				{
 					Integer.parseInt(npcStandingAnim.getText());
 				}
-				if (!npcWalkingAnim.getText().isEmpty()) {
+				if (!npcWalkingAnim.getText().isEmpty())
+				{
 					Integer.parseInt(npcWalkingAnim.getText());
 				}
-				if (!npcSpawnAnim.getText().isEmpty()) {
+				if (!npcSpawnAnim.getText().isEmpty())
+				{
 					Integer.parseInt(npcSpawnAnim.getText());
 				}
-
-			} catch (NumberFormatException ex) {
-				// Show error popup if any field contains non-integer value
+			}
+			catch (NumberFormatException ex)
+			{
 				JOptionPane.showMessageDialog(null, "Please enter valid integer values in the NPC Model ID and Animation fields.", "Error", JOptionPane.ERROR_MESSAGE);
-				return; // Stop the save process if validation fails
+				return;
 			}
 
-			// If all validations pass, proceed with saving the configuration
 			plugin.saveConfiguration(
 				configName,
 				npcModelIDFields[0].getText(),
@@ -305,27 +281,21 @@ public class NpcFollowerPanel extends PluginPanel
 				npcStandingAnim.getText(),
 				npcWalkingAnim.getText(),
 				npcSpawnAnim.getText(),
-				String.valueOf(getModelRadius()), // Save slider value as String
-				String.valueOf(npcXoffsetSlider.getValue()), // Save slider value as String
-				String.valueOf(npcYoffsetSlider.getValue())  // Save slider value as String
+				String.valueOf(getModelRadius()),
+				String.valueOf(npcXoffsetSlider.getValue()),
+				String.valueOf(npcYoffsetSlider.getValue())
 			);
 
 			dataManager.updateConfigDropdown(configDropdown);
-
-			// Set the newly saved configuration as the selected item
 			configDropdown.setSelectedItem(configName);
-
-			// Load the newly saved configuration
 			plugin.loadConfiguration(configName, npcModelIDFields);
 			plugin.loadSliderConfiguration(configName, npcRadiusSlider, npcXoffsetSlider, npcYoffsetSlider);
 			plugin.panelChange();
 		});
 
-
-		// Handle saving values
+		//instructions listener
 		instructionsButton.addActionListener(e -> showInstructionsDialog());
 
-		// Handle deleting values
 		deleteButton.addActionListener(e -> {
 			String selectedConfig = (String) configDropdown.getSelectedItem();
 			if (selectedConfig != null && !selectedConfig.isEmpty())
@@ -335,12 +305,10 @@ public class NpcFollowerPanel extends PluginPanel
 			}
 		});
 
-		// Add ActionListener to configDropdown
 		configDropdown.addActionListener(e -> {
 			String selectedConfig = (String) configDropdown.getSelectedItem();
 			if (selectedConfig != null && plugin != null && plugin.transmogInitialized)
 			{
-				System.out.println("configDropdown.addActionListener(e -> {");
 				plugin.loadConfiguration(selectedConfig, npcModelIDFields);
 				plugin.loadSliderConfiguration(selectedConfig, npcRadiusSlider, npcXoffsetSlider, npcYoffsetSlider);
 				plugin.panelChange();
@@ -348,10 +316,7 @@ public class NpcFollowerPanel extends PluginPanel
 			}
 		});
 
-		// Initialize dropdown
 		initializeConfigDropdown();
-
-		// Set the initial state of custom fields based on the checkbox
 		toggleCustomFields(enableCustomCheckbox.isSelected());
 	}
 
@@ -377,31 +342,28 @@ public class NpcFollowerPanel extends PluginPanel
 		String selectedConfig = enableCustomCheckbox.isSelected() ? (String) configDropdown.getSelectedItem() : (String) npcPresetDropdown.getSelectedItem();
 		boolean isCustomEnabled = enableCustomCheckbox.isSelected();
 
-		// Check if selectedConfig is null
-		if (selectedConfig == null || selectedConfig.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Please replace the values in the fields with" +
-				" the details of the NPC you wish to create. For help on how and where to get the values, click the \"Instructions\" button at the top of the panel.", "Error", JOptionPane.ERROR_MESSAGE);
+		if (selectedConfig == null || selectedConfig.isEmpty())
+		{
+			JOptionPane.showMessageDialog(null, "Please provide NPC details or select a preset. Click 'Instructions' for help.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
-		// Set configuration safely
-		try {
+		try
+		{
 			configManager.setConfiguration("petToNpcTransmog", "lastSelectedConfig", selectedConfig);
 			configManager.setConfiguration("petToNpcTransmog", "isCustomEnabled", String.valueOf(isCustomEnabled));
-		} catch (NullPointerException ex) {
-			// Handle the null pointer exception in case any field is null
+		}
+		catch (NullPointerException ex)
+		{
 			JOptionPane.showMessageDialog(null, "An error occurred while saving the configuration. Please check all fields.", "Error", JOptionPane.ERROR_MESSAGE);
-			ex.printStackTrace(); // Optional: log the exception for debugging
+			ex.printStackTrace();
 		}
 	}
-
 
 	public void loadLastConfiguration()
 	{
 		String lastSelectedConfig = configManager.getConfiguration("petToNpcTransmog", "lastSelectedConfig");
 		boolean isCustomEnabled = Boolean.parseBoolean(configManager.getConfiguration("petToNpcTransmog", "isCustomEnabled"));
-
-
 
 		enableCustomCheckbox.setSelected(isCustomEnabled);
 		if (isCustomEnabled)
@@ -410,11 +372,6 @@ public class NpcFollowerPanel extends PluginPanel
 			plugin.loadConfiguration(lastSelectedConfig, npcModelIDFields);
 			plugin.loadSliderConfiguration(lastSelectedConfig, npcRadiusSlider, npcXoffsetSlider, npcYoffsetSlider);
 			toggleCustomFields(enableCustomCheckbox.isSelected());
-
-			// Debugging output for custom fields
-//			for (int i = 0; i < npcModelIDFields.length; i++)
-//			{
-//			}
 		}
 		else
 		{
@@ -441,7 +398,7 @@ public class NpcFollowerPanel extends PluginPanel
 				return npcData;
 			}
 		}
-		return null; // or a default value
+		return null;
 	}
 
 	public boolean enableCustom()
@@ -451,7 +408,6 @@ public class NpcFollowerPanel extends PluginPanel
 
 	public int getModelRadius()
 	{
-		// Each slider step represents an increment of 60
 		return (npcRadiusSlider.getValue() + 1) * 60;
 	}
 
@@ -465,110 +421,161 @@ public class NpcFollowerPanel extends PluginPanel
 		return npcYoffsetSlider.getValue();
 	}
 
-	public int getNpcModelID1() {
-		try {
+	public int getNpcModelID1()
+	{
+		try
+		{
 			return parseIntegerField(npcModelIDFields[0], DEFAULT_MODEL_ID);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getNpcModelID2() {
-		try {
+	public int getNpcModelID2()
+	{
+		try
+		{
 			return parseIntegerField(npcModelIDFields[1], DEFAULT_MODEL_ID);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getNpcModelID3() {
-		try {
+	public int getNpcModelID3()
+	{
+		try
+		{
 			return parseIntegerField(npcModelIDFields[2], DEFAULT_MODEL_ID);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getNpcModelID4() {
-		try {
+	public int getNpcModelID4()
+	{
+		try
+		{
 			return parseIntegerField(npcModelIDFields[3], DEFAULT_MODEL_ID);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getNpcModelID5() {
-		try {
+	public int getNpcModelID5()
+	{
+		try
+		{
 			return parseIntegerField(npcModelIDFields[4], DEFAULT_MODEL_ID);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getNpcModelID6() {
-		try {
+	public int getNpcModelID6()
+	{
+		try
+		{
 			return parseIntegerField(npcModelIDFields[5], DEFAULT_MODEL_ID);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getNpcModelID7() {
-		try {
+	public int getNpcModelID7()
+	{
+		try
+		{
 			return parseIntegerField(npcModelIDFields[6], DEFAULT_MODEL_ID);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getNpcModelID8() {
-		try {
+	public int getNpcModelID8()
+	{
+		try
+		{
 			return parseIntegerField(npcModelIDFields[7], DEFAULT_MODEL_ID);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getNpcModelID9() {
-		try {
+	public int getNpcModelID9()
+	{
+		try
+		{
 			return parseIntegerField(npcModelIDFields[8], DEFAULT_MODEL_ID);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getNpcModelID10() {
-		try {
+	public int getNpcModelID10()
+	{
+		try
+		{
 			return parseIntegerField(npcModelIDFields[9], DEFAULT_MODEL_ID);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getStandingAnimationId() {
-		try {
+	public int getStandingAnimationId()
+	{
+		try
+		{
 			return parseIntegerField(npcStandingAnim, DEFAULT_STANDING_ANIM);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getWalkingAnimationId() {
-		try {
+	public int getWalkingAnimationId()
+	{
+		try
+		{
 			return parseIntegerField(npcWalkingAnim, DEFAULT_WALKING_ANIM);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
 
-	public int getSpawnAnimationID() {
-		try {
+	public int getSpawnAnimationID()
+	{
+		try
+		{
 			return parseIntegerField(npcSpawnAnim, DEFAULT_SPAWN_ANIM);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			return -1;
 		}
 	}
-
 
 	private int parseIntegerField(JTextField field, int defaultValue)
 	{
@@ -601,7 +608,6 @@ public class NpcFollowerPanel extends PluginPanel
 		npcWalkingAnim.setText(String.valueOf(npcData.getWalkAnim()));
 		npcSpawnAnim.setText(String.valueOf(npcData.getSpawnAnim()));
 
-		// Adjust the radius slider value
 		int radius = npcData.getRadius();
 		int sliderValue = (radius / 60) - 1;
 		npcRadiusSlider.setValue(sliderValue);
@@ -609,7 +615,6 @@ public class NpcFollowerPanel extends PluginPanel
 		npcXoffsetSlider.setValue(npcData.getOffsetX());
 		npcYoffsetSlider.setValue(npcData.getOffsetY());
 	}
-
 
 	public void updateFieldsWithDropdownData(String configName)
 	{
@@ -627,7 +632,6 @@ public class NpcFollowerPanel extends PluginPanel
 		npcWalkingAnim.setText(plugin.loadConfiguration(configName, "npcWalkingAnim"));
 		npcSpawnAnim.setText(plugin.loadConfiguration(configName, "npcSpawnAnim"));
 
-		// Load and set the radius value
 		String radiusValue = plugin.loadConfiguration(configName, "npcRadius");
 		if (radiusValue != null)
 		{
@@ -646,7 +650,6 @@ public class NpcFollowerPanel extends PluginPanel
 
 	public void toggleCustomFields(boolean enable)
 	{
-		System.out.println("toggleCustomFields");
 		npcPresetDropdown.setEnabled(!enable);
 		configDropdown.setEnabled(enable);
 		for (JTextField field : npcModelIDFields)
@@ -663,24 +666,13 @@ public class NpcFollowerPanel extends PluginPanel
 		deleteButton.setEnabled(enable);
 	}
 
-	public void setFieldsToDefaults() {
-		// Set all the model ID fields to be blank (empty string)
-//		for (JTextField modelIdField : npcModelIDFields) {
-//			modelIdField.setText("");  // Set to empty string instead of -1
-//		}
-
-		// Set the animation fields to be blank
-//		npcStandingAnim.setText("");
-//		npcWalkingAnim.setText("");
-		System.out.println("setFieldsToDefaults");
+	public void setFieldsToDefaults()
+	{
 		npcSpawnAnim.setText("");
-
-		// Set the sliders to their default values (these are numeric and should remain)
 		npcRadiusSlider.setValue((DEFAULT_RADIUS / 60) - 1);
 		npcXoffsetSlider.setValue(DEFAULT_OFFSET);
 		npcYoffsetSlider.setValue(DEFAULT_OFFSET);
 	}
-
 
 	private void showInstructionsDialog()
 	{
@@ -699,10 +691,9 @@ public class NpcFollowerPanel extends PluginPanel
 			"<b>6)</b> Click on the Data Tab<br><br>" +
 			"<b>7)</b> Use the ID under 'models:' (Not the first one listed under 'id:' which is a npcID not a modelID)<br>" +
 			"Paste it into the plugin panel NPC ModelID1 field<br><br>" +
-			"<b>8)</b> Some models combine multiple ID's in which case you will have to put the other model ID's in the panels other modelID fields" +
-			"If you look at the preset NPC's values in the plugin panel it will give you an idea of the proper way to fill it out<br><br>" +
+			"<b>8)</b> Some models combine multiple ID's in which case you will have to put the other model ID's in the panels other modelID fields<br><br>" +
 			"<b>9)</b> Use the standingAnimation ID and the walkingAnimation ID as well and put them in the panel<br><br>" +
-			"<b>10)</b> Click Save and type a name you wish to save it under.  In order for the new model to be updated you will have to save.<br><br>" +
+			"<b>10)</b> Click Save and type a name you wish to save it under. In order for the new model to be updated you will have to save.<br><br>" +
 			"<b>EXTRA INFO</b><br>" +
 			"<ul>" +
 			"<li>The NPC transmog is only seen on your end. Others will still see your actual pet</li>" +
@@ -723,4 +714,3 @@ public class NpcFollowerPanel extends PluginPanel
 		JOptionPane.showMessageDialog(null, instructions, "Instructions", JOptionPane.PLAIN_MESSAGE);
 	}
 }
-

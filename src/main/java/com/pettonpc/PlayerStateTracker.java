@@ -26,7 +26,8 @@ public class PlayerStateTracker
 		this.animationManager = animationManager;
 	}
 
-	public List<RuneLiteObject> getTransmogObjects() {
+	public List<RuneLiteObject> getTransmogObjects()
+	{
 		return transmogObjects;
 	}
 
@@ -43,13 +44,15 @@ public class PlayerStateTracker
 		updateFollowerState(follower);
 	}
 
-	public PlayerState getCurrentState() {
+	public PlayerState getCurrentState()
+	{
 		return this.currentState;
 	}
 
 	public void updateFollowerMovement(NPC follower)
 	{
-		if (transmogObjects == null || follower == null || currentState == PlayerState.SPAWNING) {
+		if (transmogObjects == null || follower == null || currentState == PlayerState.SPAWNING)
+		{
 			return;
 		}
 
@@ -59,9 +62,12 @@ public class PlayerStateTracker
 		int STANDING_ANIMATION_ID = follower.getIdlePoseAnimation();
 		int ACTION_ANIMATION_ID = follower.getPoseAnimation();
 
-		if (ACTION_ANIMATION_ID == WALKING_ANIMATION_ID) {
+		if (ACTION_ANIMATION_ID == WALKING_ANIMATION_ID)
+		{
 			newState = PlayerState.MOVING;
-		} else {
+		}
+		else
+		{
 			newState = PlayerState.STANDING;
 		}
 

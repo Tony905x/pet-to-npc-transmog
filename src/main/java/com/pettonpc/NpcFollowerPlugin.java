@@ -57,7 +57,7 @@ public class NpcFollowerPlugin extends Plugin
 	private static final int ANGLE_CONSTANT = 2048;
 	private static final int ANGLE_OFFSET = 1500;
 	private static final int TILE_TO_LOCAL_UNIT = 128;
-	private int currentSpawnAnimationId = -1; // Default or initial value
+	private int currentSpawnAnimationId = -1;
 
 
 	private AnimationManager animationManager;
@@ -67,13 +67,6 @@ public class NpcFollowerPlugin extends Plugin
 
 	private static final BufferedImage ICON = ImageUtil.loadImageResource(NpcFollowerPlugin.class, "/icon.png");
 
-//	public boolean isTransmogInitialized() {
-//		return transmogInitialized;
-//	}
-
-//	public List<RuneLiteObject> getTransmogObjects() {
-//		return transmogObjects;
-//	}
 
 	@Override
 	protected void startUp()
@@ -96,14 +89,12 @@ public class NpcFollowerPlugin extends Plugin
 
 		if (dataManager.getSavedConfigNames() == null || dataManager.getSavedConfigNames().isEmpty())
 		{
-			System.out.println(" start if (dataManager.getSavedConfigNames() == null || dataManager.getSavedConfigNames().isEmpty())");
 			panel.toggleCustomFields(false);
-//			return;
+
 		}
 
 		if (panel != null & dataManager.getSavedConfigNames() != null)
 		{
-			System.out.println("start if (panel != null & dataManager.getSavedConfigNames() != null)");
 			panel.loadLastConfiguration();
 		}
 	}
@@ -209,7 +200,6 @@ public class NpcFollowerPlugin extends Plugin
 	{
 		if (panel == null)
 		{
-			System.out.println("if (panel == null)");
 			return;
 		}
 
@@ -218,32 +208,29 @@ public class NpcFollowerPlugin extends Plugin
 		if (panel.enableCustom())
 
 		{
-			System.out.println("if (panel.enableCustom())");
 			if (dataManager.getSavedConfigNames() == null || dataManager.getSavedConfigNames().isEmpty())
 			{
-				System.out.println("if (dataManager.getSavedConfigNames() == null || dataManager.getSavedConfigNames().isEmpty())");
 
 				panel.updateFieldsWithNpcData(selectedNpc);
-//				panel.setFieldsToDefaults();
-//				return;
-			} else {
-				System.out.println("else panel.updateFieldsWithDropdownData(configName)");
+
+
+			}
+			else
+			{
 				String configName = (String) panel.getConfigDropdown().getSelectedItem();
 				panel.updateFieldsWithDropdownData(configName);
 			}
 		}
 		else
 		{
-			System.out.println("else");
 			panel.updateFieldsWithNpcData(selectedNpc);
 		}
 
 		clientThread.invokeLater(() -> {
 			Model mergedModel = createNpcModel(selectedNpc);
 			if (mergedModel != null && !transmogObjects.isEmpty())
-//			if (transmogInitialized)
+
 			{
-				System.out.println("if (mergedModel != null && !transmogObjects.isEmpty())");
 				RuneLiteObject transmogObject = transmogObjects.get(0);
 				transmogObject.setModel(mergedModel);
 				transmogObject.setActive(true);
@@ -273,7 +260,6 @@ public class NpcFollowerPlugin extends Plugin
 			offsetX = panel.getOffsetX() * TILE_TO_LOCAL_UNIT;
 			offsetY = panel.getOffsetY() * TILE_TO_LOCAL_UNIT;
 
-			// Fetch custom spawn animation ID
 			spawnAnimationId = panel.getSpawnAnimationID();
 		}
 		else
@@ -281,7 +267,6 @@ public class NpcFollowerPlugin extends Plugin
 			offsetX = panel.getSelectedNpc().getOffsetX() * TILE_TO_LOCAL_UNIT;
 			offsetY = panel.getSelectedNpc().getOffsetY() * TILE_TO_LOCAL_UNIT;
 
-			// Fetch spawn animation ID from the selected NPC
 			spawnAnimationId = panel.getSelectedNpc().getSpawnAnim();
 		}
 
@@ -321,14 +306,12 @@ public class NpcFollowerPlugin extends Plugin
 					}
 					transmogObject.setRadius(radius);
 
-					// Set the model of the transmog object
 					Model mergedModel = createNpcModel(panel.getSelectedNpc());
 					if (mergedModel != null)
 					{
 						transmogObject.setModel(mergedModel);
 					}
 
-					// Check if spawn animation has changed
 					if (spawnAnimationId != currentSpawnAnimationId)
 					{
 						currentSpawnAnimationId = spawnAnimationId; // Update the stored spawn animation ID
@@ -341,7 +324,6 @@ public class NpcFollowerPlugin extends Plugin
 			}
 		}
 	}
-
 
 
 	public Model createNpcModel(NpcData selectedNpc)
@@ -410,14 +392,9 @@ public class NpcFollowerPlugin extends Plugin
 			return null;
 		}
 
-		// Apply animations if needed (this part depends on your existing logic)
-		// mergedModelData.setStandingAnim(standingAnim);
-		// mergedModelData.setWalkingAnim(walkingAnim);
-		// mergedModelData.setSpawnAnim(spawnAnim);
 
 		return mergedModelData.light();
 	}
-
 
 	public void setTransmogObjects(List<RuneLiteObject> transmogObjects)
 	{
