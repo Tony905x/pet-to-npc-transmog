@@ -21,11 +21,6 @@ public enum NpcData
 //	Whisperer("Nightmare", Lists.newArrayList(49222,49218,49221,49224,49219), 10230, 10232, 300, 8609, 2);
 
 
-
-
-
-
-
 	// Properties
 	final String name;
 	final List<Integer> modelIDs;
