@@ -5,6 +5,9 @@ import net.runelite.client.ui.PluginPanel;
 import javax.swing.*;
 import java.awt.*;
 import net.runelite.client.config.ConfigManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class NpcFollowerPanel extends PluginPanel
 {
@@ -30,6 +33,8 @@ public class NpcFollowerPanel extends PluginPanel
 	private static final int DEFAULT_STANDING_ANIM = -1;
 	private static final int DEFAULT_WALKING_ANIM = -1;
 	private static final int DEFAULT_SPAWN_ANIM = 4;
+	private static final Logger logger = LoggerFactory.getLogger(NpcFollowerPanel.class);
+
 
 	public NpcFollowerPanel(NpcFollowerPlugin plugin, ConfigManager configManager, DataManager dataManager)
 	{
@@ -47,6 +52,7 @@ public class NpcFollowerPanel extends PluginPanel
 		configDropdown = new JComboBox<>();
 		configDropdown.setToolTipText("Select a saved custom configuration.");
 		npcModelIDFields = new JTextField[10];
+
 		for (int i = 0; i < npcModelIDFields.length; i++)
 		{
 			npcModelIDFields[i] = new JTextField();
@@ -344,7 +350,6 @@ public class NpcFollowerPanel extends PluginPanel
 
 		if (selectedConfig == null || selectedConfig.isEmpty())
 		{
-			JOptionPane.showMessageDialog(null, "Please provide NPC details or select a preset. Click 'Instructions' for help.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -356,7 +361,7 @@ public class NpcFollowerPanel extends PluginPanel
 		catch (NullPointerException ex)
 		{
 			JOptionPane.showMessageDialog(null, "An error occurred while saving the configuration. Please check all fields.", "Error", JOptionPane.ERROR_MESSAGE);
-			ex.printStackTrace();
+			logger.error("Error occurred while saving the configuration", ex); // Change to use SLF4J for logging
 		}
 	}
 
