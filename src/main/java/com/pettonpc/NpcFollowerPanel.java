@@ -71,7 +71,7 @@ public class NpcFollowerPanel extends PluginPanel
 		instructionsButton = new JButton("Instructions");
 		instructionsButton.setToolTipText("View instructions for using the plugin.");
 
-		// Create panels
+		// panel creation
 		JPanel titlePanel = new JPanel(new BorderLayout());
 		JPanel mainPanel = new JPanel(new GridBagLayout());
 		mainPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
