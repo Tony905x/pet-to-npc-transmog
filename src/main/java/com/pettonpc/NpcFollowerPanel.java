@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class NpcFollowerPanel extends PluginPanel
+public class NpcFollowerPanel extends PluginPanel implements ConfigProvider
 {
 	private final NpcFollowerPlugin plugin;
 	private final ConfigManager configManager;
@@ -326,6 +326,9 @@ public class NpcFollowerPanel extends PluginPanel
 		toggleCustomFields(enableCustomCheckbox.isSelected());
 	}
 
+
+
+
 	private void addLabelAndField(JPanel panel, String labelText, JComponent field)
 	{
 		JLabel label = new JLabel(labelText);
@@ -342,6 +345,37 @@ public class NpcFollowerPanel extends PluginPanel
 			dataManager.initializeConfigDropdown(configDropdown);
 		}
 	}
+
+
+
+	@Override
+	public String getCurrentConfigurationName() {
+		return configDropdown.getSelectedItem().toString();
+	}
+
+	@Override
+	public void setCurrentConfigurationName(String configName) {
+		configDropdown.setSelectedItem(configName);
+	}
+
+	public void updateFieldsBasedOnSelection() {
+		if (enableCustom()) {
+			String configName = getCurrentConfigurationName();
+			if (configName != null && !configName.isEmpty()) {
+				updateFieldsWithDropdownData(configName);
+			} else {
+				NpcData selectedNpc = getSelectedNpc();
+				updateFieldsWithNpcData(selectedNpc);
+			}
+		} else {
+			NpcData selectedNpc = getSelectedNpc();
+			updateFieldsWithNpcData(selectedNpc);
+		}
+	}
+
+
+
+
 
 	public void saveCurrentConfiguration()
 	{
@@ -393,6 +427,13 @@ public class NpcFollowerPanel extends PluginPanel
 		}
 	}
 
+	@Override
+	public boolean enableCustom()
+	{
+		return enableCustomCheckbox.isSelected();
+	}
+
+	@Override
 	public NpcData getSelectedNpc()
 	{
 		String selectedNpcName = (String) npcPresetDropdown.getSelectedItem();
@@ -404,11 +445,6 @@ public class NpcFollowerPanel extends PluginPanel
 			}
 		}
 		return null;
-	}
-
-	public boolean enableCustom()
-	{
-		return enableCustomCheckbox.isSelected();
 	}
 
 	public int getModelRadius()
@@ -570,15 +606,17 @@ public class NpcFollowerPanel extends PluginPanel
 		}
 	}
 
-	public int getSpawnAnimationID()
-	{
-		try
-		{
-			return parseIntegerField(npcSpawnAnim, DEFAULT_SPAWN_ANIM);
+	@Override
+	public int getSpawnAnimationID() {
+		if (npcSpawnAnim == null) {
+			System.out.println("npcSpawnAnim is null. Returning default value.");
+			return DEFAULT_SPAWN_ANIM;
 		}
-		catch (NumberFormatException e)
-		{
-			return -1;
+		try {
+			return Integer.parseInt(npcSpawnAnim.getText());
+		} catch (NumberFormatException e) {
+			System.out.println("Invalid value in npcSpawnAnim: {}" + npcSpawnAnim.getText());
+			return DEFAULT_SPAWN_ANIM;
 		}
 	}
 
@@ -592,10 +630,10 @@ public class NpcFollowerPanel extends PluginPanel
 		return Integer.parseInt(text);
 	}
 
-	public JComboBox<String> getConfigDropdown()
-	{
-		return configDropdown;
-	}
+//	public JComboBox<String> getConfigDropdown()
+//	{
+//		return configDropdown;
+//	}
 
 	public void updateFieldsWithNpcData(NpcData npcData)
 	{

@@ -10,22 +10,22 @@ import net.runelite.api.RuneLiteObject;
 public class AnimationManager
 {
 	private final Client client;
-	private final NpcFollowerPanel panel;
+//	private final NpcFollowerPanel panel;
 	private List<RuneLiteObject> transmogObjects;
 	private int previousWalkingFrame = -1;
 	private int previousStandingFrame = -1;
 	private int currentFrame;
 	private PlayerStateTracker playerStateTracker;
+	private ConfigProvider configProvider;
 
 	public void setPlayerStateTracker(PlayerStateTracker playerStateTracker)
 	{
 		this.playerStateTracker = playerStateTracker;
 	}
 
-	public AnimationManager(Client client, NpcFollowerPanel panel, PlayerStateTracker playerStateTracker)
-	{
+	public AnimationManager(Client client, ConfigProvider configProvider, PlayerStateTracker playerStateTracker) {
 		this.client = client;
-		this.panel = panel;
+		this.configProvider = configProvider;
 		this.playerStateTracker = playerStateTracker;
 	}
 
@@ -36,7 +36,7 @@ public class AnimationManager
 
 	public void triggerSpawnAnimation(NPC follower)
 	{
-		NpcData selectedNpc = panel.getSelectedNpc();
+		NpcData selectedNpc = configProvider.getSelectedNpc();
 		int spawnAnimationId;
 		Animation spawnAnimation;
 
@@ -45,13 +45,13 @@ public class AnimationManager
 			return;
 		}
 
-		if (!panel.enableCustom())
+		if (!configProvider.enableCustom())
 		{
 			spawnAnimationId = selectedNpc.spawnAnim;
 		}
 		else
 		{
-			spawnAnimationId = panel.getSpawnAnimationID();
+			spawnAnimationId = configProvider.getSpawnAnimationID();
 		}
 
 		spawnAnimation = client.loadAnimation(spawnAnimationId);
@@ -80,8 +80,8 @@ public class AnimationManager
 			cancelCurrentAnimation();
 		}
 
-		NpcData selectedNpc = panel.getSelectedNpc();
-		int walkingAnimationId = (panel.enableCustom()) ? panel.getWalkingAnimationId() : selectedNpc.getWalkAnim();
+		NpcData selectedNpc = configProvider.getSelectedNpc();
+		int walkingAnimationId = (configProvider.enableCustom()) ? configProvider.getWalkingAnimationId() : selectedNpc.getWalkAnim();
 		Animation walkingAnimation = client.loadAnimation(walkingAnimationId);
 
 		if (selectedNpc == null || walkingAnimation == null || follower == null)
@@ -114,13 +114,13 @@ public class AnimationManager
 			return;
 		}
 
-		NpcData selectedNpc = panel.getSelectedNpc();
+		NpcData selectedNpc = configProvider.getSelectedNpc();
 		if (selectedNpc == null)
 		{
 			return;
 		}
 
-		int standingAnimationId = (panel.enableCustom()) ? panel.getStandingAnimationId() : selectedNpc.getStandingAnim();
+		int standingAnimationId = (configProvider.enableCustom()) ? configProvider.getStandingAnimationId() : selectedNpc.getStandingAnim();
 		Animation standingAnimation = client.loadAnimation(standingAnimationId);
 
 		if (standingAnimation == null || follower == null)
